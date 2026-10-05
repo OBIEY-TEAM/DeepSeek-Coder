@@ -1,5 +1,7 @@
 import unittest
-from serve.security_audit import SecurityAuditor, SecurityAuditReport
+
+from serve.security_audit import SecurityAuditor
+
 
 class TestSecurityAudit(unittest.TestCase):
     """

@@ -1,6 +1,6 @@
 import os
+from collections.abc import Iterator
 from threading import Thread
-from typing import Iterator
 
 import gradio as gr
 import torch
@@ -132,7 +132,7 @@ def generate(
             torch.cuda.empty_cache()
         yield "An Out of Memory (OOM) error occurred on the GPU. Please try again with shorter context or fewer generation tokens."
     except Exception as e:
-        yield f"Generation error: {str(e)}"
+        yield f"Generation error: {e!s}"
 
 
 chat_interface = gr.ChatInterface(

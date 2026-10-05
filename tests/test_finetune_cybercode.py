@@ -1,8 +1,13 @@
-import os
 import json
+import os
 import tempfile
 import unittest
-from finetune.finetune_cybercode import anonymize_code_and_text, clean_and_anonymize_dataset
+
+from finetune.finetune_cybercode import (
+    anonymize_code_and_text,
+    clean_and_anonymize_dataset,
+)
+
 
 class TestFinetuneCyberCode(unittest.TestCase):
     """

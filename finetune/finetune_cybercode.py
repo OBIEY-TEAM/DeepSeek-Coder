@@ -1,25 +1,12 @@
 import argparse
-import copy
 import json
 import os
 import re
 
-import torch
-import transformers
-from datasets import Dataset
-
 from finetune.finetune_deepseekcoder import (
     DEFAULT_MODEL_NAME,
-    IGNORE_INDEX,
-    EOT_TOKEN,
-    ModelArguments,
-    DataArguments,
-    LoraArguments,
-    TrainingArguments,
-    DataCollatorForSupervisedDataset,
-    build_instruction_prompt,
-    preprocess,
 )
+
 
 def anonymize_code_and_text(text: str) -> str:
     """

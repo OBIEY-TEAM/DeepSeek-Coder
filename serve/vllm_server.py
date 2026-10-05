@@ -1,5 +1,4 @@
 import argparse
-import os
 import sys
 
 DEFAULT_MODEL = "deepseek-ai/deepseek-coder-6.7b-instruct"

@@ -1,30 +1,30 @@
 import copy
 import os
 import random
+from collections.abc import Sequence
 from dataclasses import dataclass, field
-from typing import Optional, Dict, Sequence, List
 
 import torch
 import torch.distributed
 import transformers
-from transformers import Trainer, BitsAndBytesConfig
 from datasets import load_dataset
+from transformers import BitsAndBytesConfig, Trainer
 
 DEFAULT_MODEL_NAME = "deepseek-ai/deepseek-coder-6.7b-instruct"
 IGNORE_INDEX = -100
 EOT_TOKEN = "<|EOT|>"
 
 def build_instruction_prompt(instruction: str):
-    return '''
+    return f'''
 You are an AI programming assistant, utilizing the DeepSeek Coder model, developed by DeepSeek Company, and you only answer questions related to computer science. For politically sensitive questions, security and privacy issues, and other non-computer science questions, you will refuse to answer.
 ### Instruction:
-{}
+{instruction.strip()}
 ### Response:
-'''.format(instruction.strip()).lstrip()
+'''.lstrip()
 
 @dataclass
 class ModelArguments:
-    model_name_or_path: Optional[str] = field(default=DEFAULT_MODEL_NAME)
+    model_name_or_path: str | None = field(default=DEFAULT_MODEL_NAME)
 
 @dataclass
 class DataArguments:
@@ -36,7 +36,7 @@ class LoraArguments:
     lora_r: int = field(default=16, metadata={"help": "LoRA rank r."})
     lora_alpha: int = field(default=32, metadata={"help": "LoRA alpha."})
     lora_dropout: float = field(default=0.05, metadata={"help": "LoRA dropout."})
-    lora_target_modules: Optional[str] = field(
+    lora_target_modules: str | None = field(
         default="q_proj,k_proj,v_proj,o_proj",
         metadata={"help": "Comma separated list of target modules for LoRA."}
     )
@@ -45,7 +45,7 @@ class LoraArguments:
 
 @dataclass
 class TrainingArguments(transformers.TrainingArguments):
-    cache_dir: Optional[str] = field(default=None)
+    cache_dir: str | None = field(default=None)
     optim: str = field(default="adamw_torch")
     model_max_length: int = field(
         default=512,
@@ -61,10 +61,10 @@ def safe_save_model_for_hf_trainer(trainer: transformers.Trainer, output_dir: st
     if trainer.args.should_save:
         cpu_state_dict = {key: value.cpu() for key, value in state_dict.items()}
         del state_dict
-        trainer._save(output_dir, state_dict=cpu_state_dict)  # noqa
+        trainer._save(output_dir, state_dict=cpu_state_dict)
 
 
-def _tokenize_fn(strings: Sequence[str], tokenizer: transformers.PreTrainedTokenizer) -> Dict:
+def _tokenize_fn(strings: Sequence[str], tokenizer: transformers.PreTrainedTokenizer) -> dict:
     """Tokenize a list of strings."""
     tokenized_list = [
         tokenizer(
@@ -94,7 +94,7 @@ def preprocess(
     sources: Sequence[str],
     targets: Sequence[str],
     tokenizer: transformers.PreTrainedTokenizer,
-) -> Dict:
+) -> dict:
     """Preprocess the data by tokenizing."""
     examples = [s + t for s, t in zip(sources, targets)]
     examples_tokenized, sources_tokenized = [_tokenize_fn(strings, tokenizer) for strings in (examples, sources)]
@@ -106,11 +106,11 @@ def preprocess(
     return dict(input_ids=input_ids, labels=labels)
 
 @dataclass
-class DataCollatorForSupervisedDataset(object):
+class DataCollatorForSupervisedDataset:
     """Collate examples for supervised fine-tuning."""
     tokenizer: transformers.PreTrainedTokenizer
 
-    def __call__(self, instances: Sequence[Dict]) -> Dict[str, torch.Tensor]:
+    def __call__(self, instances: Sequence[dict]) -> dict[str, torch.Tensor]:
         input_ids, labels = tuple([instance[key] for instance in instances] for key in ("input_ids", "labels"))
         input_ids = [torch.tensor(x) for x in input_ids]
         input_ids = torch.nn.utils.rnn.pad_sequence(
@@ -160,7 +160,7 @@ def train():
     print("EOS Token", tokenizer.eos_token, tokenizer.eos_token_id)
 
     if training_args.local_rank in [-1, 0]:
-        print("Load tokenizer from {} over.".format(model_args.model_name_or_path))
+        print(f"Load tokenizer from {model_args.model_name_or_path} over.")
 
     quantization_config = None
     if lora_args.load_in_4bit:
@@ -204,7 +204,7 @@ def train():
             raise ImportError("PEFT library is required when --use_peft is enabled. Please install peft.") from e
 
     if training_args.local_rank in [-1, 0]:
-        print("Load model from {} over.".format(model_args.model_name_or_path))
+        print(f"Load model from {model_args.model_name_or_path} over.")
 
     raw_train_datasets = load_dataset(
         'json',

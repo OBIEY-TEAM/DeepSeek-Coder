@@ -1,5 +1,7 @@
 import unittest
-from finetune.finetune_deepseekcoder import build_instruction_prompt, EOT_TOKEN
+
+from finetune.finetune_deepseekcoder import EOT_TOKEN, build_instruction_prompt
+
 
 class TestTemplates(unittest.TestCase):
     """
