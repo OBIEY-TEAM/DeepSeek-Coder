@@ -88,9 +88,41 @@ Suite complète permettant de mesurer la performance du modèle sur les benchmar
 1. **Architecture Propre et Modularisée** : Séparation claire entre API, fine-tuning, évaluation et démo.
 2. **Sécurité et Conformité Intégrées** : Anonymisation des logs (SHA-256), anonymisation des jeux de données de fine-tuning, authentification par token, rate limiting.
 3. **Respect Rigoureux du Lock V1** : Garde-fous efficaces empêchant toute dérive vers les modèles non autorisés.
-4. **Documentation Enterprise Complete** : Présence de documents institutionnels complets (`INCIDENT_RESPONSE.md`, `SLA.md`, `COMPLIANCE.md`, `SECURITY_AUDIT_REPORT.md`, `ROADMAP.md`).
+4. **Documentation Enterprise Complète** : Présence de documents institutionnels complets (`INCIDENT_RESPONSE.md`, `SLA.md`, `COMPLIANCE.md`, `SECURITY_AUDIT_REPORT.md`, `ROADMAP.md`).
 
 ---
 
-## 5. Synthèse de l'État Actuel
-Le projet est techniquement solide, fonctionnel, bien documenté et prêt pour un déploiement en conteneur. Cependant, plusieurs axes de modernisation et d'optimisation technique peuvent être apportés pour le faire passer au niveau supérieur (cf. `amelioration.md`).
+## 5. Analyse Approfondie des Limites & Points Méritant Attention (9 Axes Clés)
+
+L'état actuel du projet présente des fondations solides mais comporte des limites structurelles et opérationnelles identifiées :
+
+1. **Limites du Moteur d'Audit Purement Heuristique (Regex)** :
+   - L'analyse par Regex produit des faux positifs (code légitime ou commenté capturé) et des faux négatifs (vulnérabilités contextuelles, injections multi-variables).
+   - Manque de compréhension du flux de données (Taint Analysis) et de syntaxe.
+
+2. **Qualité et Complétude du Rapport d'Audit** :
+   - Absence actuelle d'un score de confiance par vulnérabilité (élevé, moyen, faible).
+   - Manque de cartographie explicite vers les standards industriels CWE / OWASP Top 10 et d'extraits de code comparatifs ("code avant / code après").
+
+3. **Gestion des Modèles et Inférence en Production** :
+   - Absences de mécanismes de chargement/déchargement dynamique des adaptateurs LoRA ou sous-modèles (1.3B, 6.7B, 33B).
+   - Absences de stratégie de secours en cas d'OOM VRAM (Out-Of-Memory) et de file d'attente asynchrone (Celery/Ray/RabbitMQ) lors des pics de charge.
+
+4. **Monitoring Réel et Observabilité** :
+   - Le serveur FastAPI ne possède pas encore d'exportateur de métriques Prometheus (`/metrics`) pour suivre le Time To First Token (TTFT), les requêtes/sec et l'utilisation mémoire GPU/VRAM en temps réel.
+
+5. **Absence de Tests de Charge et Benchmarking Performance** :
+   - Absence de scripts Locust ou k6 pour valider la tenue sous charge (100 à 1000 utilisateurs simultanés).
+   - Latences sous contention et comportement sous saturation GPU non quantifiés.
+
+6. **Gestion des Erreurs Utilisateur & Edge Cases** :
+   - Comportement indéfini en cas de payload trop volumineux (>10 Mo), de langages exotiques non supportés, de jetons expirés ou de dépassement de rate limit sans format standard d'erreur (RFC 7807 Problem Details).
+
+7. **Versioning des Modèles et Adaptateurs LoRA** :
+   - Absence de Model Registry (MLflow, DVC ou Git LFS) et de numérotation sémantique (SemVer v1.0.0, v1.0.1) pour tracer les adaptateurs entraînés et les versions d'artefacts déployés.
+
+8. **Plan de Scalabilité Multi-GPU / Multi-Noeuds** :
+   - Déploiement actuel orienté mono-instance VPS Docker Compose, sans manifeste Kubernetes (K8s) ni répartition de charge horizontal / auto-scaling (HPA / KEDA) multi-GPU.
+
+9. **Plan de Sortie et Stratégie de Secours (Exit Strategy)** :
+   - Dépendance complète à la famille DeepSeek-Coder V1 sans plan de basculement à chaud (Fallback) vers un autre LLM de code open-source (Mistral, Qwen2.5-Coder, Llama-3-Code) en cas de dépréciation ou d'évolution réglementaire.

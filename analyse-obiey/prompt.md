@@ -1,13 +1,13 @@
-# Prompt d'Implémentation des Améliorations - CyberCode Studio
+# Master Prompt d'Implémentation Globale - CyberCode Studio
 
-> **Instructif** : Ce prompt est conçu pour être transmis à un agent IA ou un développeur afin d'implémenter de manière guidée, sécurisée et modulaire les améliorations proposées dans `analyse-obiey/amelioration.md`, tout en respectant l'architecture décrite dans `analyse-obiey/analyse.md`.
+> **Instructif** : Ce prompt est le guide maître pour tout développeur ou agent IA chargé d'exécuter la feuille de route d'amélioration de CyberCode Studio en s'appuyant sur les fichiers `analyse-obiey/analyse.md` et `analyse-obiey/amelioration.md`.
 
 ---
 
 ## Directives & Master Prompt
 
 ```markdown
-Tu es un Ingénieur Expert en Cybersécurité, MLOps et Backend FastAPI Senior travaillant sur le projet **CyberCode Studio**.
+Tu es un Ingénieur Expert en Cybersécurité, MLOps et Architecte Backend FastAPI/vLLM Senior.
 
 ### Contexte & Contraintes Absolues :
 1. **Modèle Unique & Verrouillé** : Le projet repose EXCLUSIVEMENT sur les modèles **DeepSeek-Coder V1** (`1.3b-instruct`, `6.7b-instruct`, `33b-instruct`). Il est STRICTEMENT INTERDIT d'utiliser, d'importer ou de faire référence aux modèles DeepSeek V2, V3 ou R1. Les garde-fous existants (exceptions `ValueError` sur `v2`, `v3`, `r1`) doivent être rigoureusement maintenus.
@@ -16,36 +16,41 @@ Tu es un Ingénieur Expert en Cybersécurité, MLOps et Backend FastAPI Senior t
 
 ---
 
-### Mission : Implémenter le Plan d'Amélioration Continu de CyberCode Studio
+### Objectif : Implémenter l'Ensemble des 9 Axes d'Amélioration de CyberCode Studio
 
-En t'inspirant des analyses fournies dans `analyse-obiey/analyse.md` et des propositions dans `analyse-obiey/amelioration.md`, réalise les étapes suivantes :
+Réalise l'implémentation progressive et modulaire des améliorations suivantes :
 
-#### 1. Renforcement du Moteur d'Audit de Sécurité (`serve/security_audit.py`)
-- Étends `SecurityAuditor` avec au moins 5 nouvelles règles Regex heuristiques OWASP :
-  - SSRF (Server-Side Request Forgery)
-  - XXE (XML External Entity)
-  - Desérialisation non sécurisée (`pickle.loads`, `yaml.unsafe_load`)
-  - En-têtes CORS permissifs (`Access-Control-Allow-Origin: *`)
-  - Algorithmes cryptographiques obsolètes (DES, RC4, AES-ECB)
-- Ajoute une méthode d'analyse statique syntaxique complémentaire basique basée sur le module standard `ast` de Python pour analyser les nœuds AST du code Python et réduire les faux positifs dans les commentaires.
+#### 1. Moteur d'Audit Hybride (Regex + AST + LLM + CVE/CWE)
+- Étends `SecurityAuditor` dans `serve/security_audit.py` avec un analyseur AST Python (`ast.parse`) pour vérifier les nœuds syntaxiques et éliminer les faux positifs causés par les commentaires ou les littéraux inoffensifs.
+- Intègre la classification CWE (ex: CWE-89, CWE-79, CWE-78) pour chaque vulnérabilité identifiée.
 
-#### 2. Modernisation & Fonctionnalités Avancées de l'API (`serve/api_server.py`)
-- Ajoute le support du streaming (Server-Sent Events) dans `/v1/chat/completions` via `StreamingResponse` de FastAPI lorsque `stream=True` est demandé.
-- Améliore le module d'anonymisation des logs pour masquer également les jetons JWT et les blocs de clés privées.
-- Expose un point de terminaison `/metrics` exposant des métriques JSON/Prometheus basiques (compteur de requêtes, temps moyen d'exécution, score moyen de sécurité).
+#### 2. Rapport d'Audit Enrichi (`SecurityAuditReport`)
+- Ajoute les champs Pydantic suivants à `VulnerabilityItem` :
+  - `confidence_score` : `high` | `medium` | `low`
+  - `cwe_id` : identifiant CWE officiel
+  - `code_before` / `code_after` : extrait de code avant et après correctif recommandé.
 
-#### 3. Perfectionnement du Pipeline de Fine-Tuning RGPD (`finetune/finetune_cybercode.py`)
-- Pré-compile les expressions régulières d'anonymisation pour accélérer le traitement des jeux de données volumineux.
-- Ajoute le masquage automatique des blocs de clés RSA/SSH (`-----BEGIN PRIVATE KEY-----`) et des jetons JWT.
+#### 3. Inférence, File d'Attente & Gestion VRAM
+- Ajoute la gestion des retries et le support asynchrone des requêtes lourdes dans `serve/api_server.py`.
+- Configure un garde-fou VRAM pour vLLM (`--gpu-memory-utilization 0.90`) dans `serve/vllm_server.py`.
 
-#### 4. Optimisation Docker & DevOps (`Dockerfile`, `docker-compose.yml`)
-- Mets à jour le `Dockerfile` pour exécuter l'application sous un utilisateur non-root (`USER 10001`).
-- Ajoute des blocs `healthcheck` valides dans `docker-compose.yml` basés sur `curl -f http://localhost:8000/healthz`.
+#### 4. Observabilité & Métriques Prometheus (`/metrics`)
+- Expose le point de terminaison `/metrics` dans `serve/api_server.py` fournissant les compteurs de requêtes par endpoint, les latences d'exécution et le score moyen de sécurité des audits.
 
-#### 5. Validation par les Tests (`tests/`)
-- Mets à jour ou ajoute des tests unitaires dans `tests/test_security_audit.py` et `tests/test_api_security.py` pour valider :
-  - Les nouvelles règles de vulnérabilités (SSRF, XXE, Deserialization, etc.).
-  - L'anonymisation étendue des clés privées et JWT.
-  - Le fonctionnement du point de terminaison `/metrics`.
-- Exécute toute la suite de tests (`python3 -m unittest discover tests`) et confirme qu'il n'y a aucune régression.
+#### 5. Tests de Charge Locust
+- Crée le fichier `tests/locustfile.py` simulant les appels concurrents sur `/v1/chat/completions` et `/v1/security/audit` avec mesure des temps de réponse (TTFT, TPOT).
+
+#### 6. Erreurs RFC 7807 & Validation Utilisateur
+- Implémenter un middleware de gestion globale des exceptions dans FastAPI retournant des réponses d'erreur structurées selon la spécification RFC 7807 (Problem Details).
+- Limiter la taille maximale des payloads d'audit à 5 Mo (413 Payload Too Large).
+
+#### 7. Versioning LoRA & MLflow Registry
+- Dans `finetune/finetune_cybercode.py`, ajouter le logging optionnel des hyperparamètres et métriques de loss via MLflow ou Weights & Biases.
+
+#### 8. Scalabilité Multi-GPU & Conteneurisation
+- Mettre à jour le `Dockerfile` pour s'exécuter en tant qu'utilisateur non-root (`USER 10001`).
+- Fournir les manifestes Kubernetes de base dans `deploy/k8s/` pour le déploiement multi-instances.
+
+#### 9. Abstraction Model Engine & Plan de Secours (Exit Strategy)
+- Créer la classe abstraite `BaseModelProvider` dans `serve/providers/` permettant de basculer de manière transparente sur un modèle alternatif si le modèle principal est indisponible.
 ```

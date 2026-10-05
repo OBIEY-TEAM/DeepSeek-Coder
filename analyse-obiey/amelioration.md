@@ -1,66 +1,64 @@
 # Propositions d'Améliorations - CyberCode Studio (DeepSeek-Coder V1)
 
-Ce document présente une feuille de route détaillée des améliorations techniques, architecturales et opérationnelles proposées pour le projet **CyberCode Studio**, classées par catégorie.
+Ce document présente une feuille de route détaillée des améliorations techniques, architecturales et opérationnelles proposées pour le projet **CyberCode Studio**, organisées autour des 9 axes stratégiques.
 
 ---
 
-## 1. Améliorations de la Sécurité & Moteur d'Audit (`serve/security_audit.py` & `serve/api_server.py`)
-
-1. **Extension du Moteur Heuristique OWASP Top 10** :
-   - Ajouter de nouvelles règles Regex pour détecter :
-     - Injections SSRF (Server-Side Request Forgery).
-     - Injections XXE (XML External Entity).
-     - Desérialisation non sécurisée (`pickle.loads`, `yaml.unsafe_load`).
-     - Configuration CORS permissive (`Access-Control-Allow-Origin: *`).
-     - Cryptographie obsolète (DES, RC4, ECB mode dans AES).
-2. **Analyse AST (Abstract Syntax Tree) Python & SAST Multi-Langage** :
-   - Intégrer une analyse par arbre syntaxique (`ast` Python) en complément des Regex pour supprimer les faux positifs causés par les commentaires ou les chaînes littérales innocentes.
-3. **Persistance Redis pour le Rate Limiting** :
-   - Remplacer le dictionnaire en mémoire RAM (`rate_limit_store: dict`) de `api_server.py` par un magasin Redis ou sliding-window persistant afin de supporter le passage à l'échelle horizontal sur plusieurs répliques gérées par un load balancer.
-4. **Gestion des Clés API Avancée** :
-   - Implémenter un hachage des clés API (ex: SHA-256 avec sel) plutôt qu'une comparaison directe de chaînes en clair dans le code/environnement.
+## 1. Moteur d'Audit Hybride (Regex + AST + LLM + CVE)
+- **Analyse Syntaxique AST (Python, JS, Java)** : Intégrer un analyseur AST (ex: `ast` natif Python, `bandit`, `eslint-plugin-security`) pour vérifier les arbres syntaxiques et éliminer les faux positifs liés aux commentaires ou chaînes inoffensives.
+- **Inférence LLM Contextuelle** : Exploiter le modèle DeepSeek-Coder V1 pour analyser le contexte sémantique approfondi du code et générer des explications personnalisées.
+- **Base de Vulnérabilités CVE/CWE** : Croiser les découvertes avec une base locale de CVEs et le dictionnaire CWE (Common Weakness Enumeration).
 
 ---
 
-## 2. Améliorations de l'Inférence & API Server (`serve/`)
-
-1. **Streaming des Réponses (Server-Sent Events / SSE)** :
-   - Ajouter le support du mode `stream: true` dans `/v1/chat/completions` et `/v1/completions` en utilisant `StreamingResponse` de FastAPI / Starlette.
-2. **Intégration Bounded Queue / Background Tasks pour les Audits Lourds** :
-   - Déléguer les analyses de grands fichiers de code à une file d'attente asynchrone (Celery / FastAPI BackgroundTasks) avec retour d'un `job_id` et endpoint `/v1/security/audit/status/{job_id}`.
-3. **OpenAPI / Swagger Enrichi & Métriques Prometheus** :
-   - Exposer un point de terminaison `/metrics` pour Prometheus (temps de latence, nombre de requêtes par endpoint, taux d'erreurs 4xx/5xx, score moyen de sécurité).
+## 2. Standardisation & Qualité du Rapport d'Audit (`SecurityAuditReport`)
+- **Score de Confiance** : Ajouter un champ `confidence_score` (high, medium, low) sur chaque vulnérabilité détectée.
+- **Traçabilité Industrielle** : Associer chaque faille à un identifiant CWE (ex: CWE-89 pour SQLi, CWE-79 pour XSS) et une catégorie OWASP Top 10.
+- **Correctifs Avant/Après** : Générer un diff clair de recommandation (`code_before` vs `code_after`).
 
 ---
 
-## 3. Améliorations MLOps & Fine-Tuning (`finetune/`)
-
-1. **Validation et Nettoyage de Données Accéléré** :
-   - Optimiser `anonymize_code_and_text` dans `finetune_cybercode.py` en pré-compilant toutes les expressions régulières.
-   - Ajouter la détection des clés privées RSA/SSH/PGP et des JWT tokens.
-2. **Support de LoRA Target Modules Paramétrables** :
-   - Permettre de cibler plus finement les couches d'attention et MLP (`q_proj`, `k_proj`, `v_proj`, `o_proj`, `gate_proj`, `up_proj`, `down_proj`) via la CLI.
-3. **Integration MLflow / Weights & Biases (WandB)** :
-   - Ajouter des flags d'activation pour le tracking automatique des métriques d'entraînement, de loss et d'évaluation vers WandB ou MLflow.
+## 3. Gestion de la Production & vLLM VRAM
+- **Chargement/Déchargement Dynamique** : Mettre en place un gestionnaire de modèles vLLM / LoRA adapters dynamic swapper.
+- **File d'Attente Asynchrone (Celery / Ray / RabbitMQ)** : Traiter les analyses lourdes en arrière-plan avec gestion des priorités et reprise sur erreur.
+- **Prévention OOM VRAM & Retries** : Configurer la gestion dynamique de la mémoire VRAM GPU (`gpu_memory_utilization=0.90`) avec fallback automatique vers une quantification 4-bit/8-bit sous forte contrainte.
 
 ---
 
-## 4. Améliorations DevOps, Conteneurisation & CI/CD
-
-1. **Multi-Stage Build Docker Optimisé** :
-   - Optimiser le `Dockerfile` avec un builder multi-stage pour réduire la taille de l'image de production et éliminer les dépendances de compilation inutiles dans le conteneur final.
-2. **Healthchecks Docker Compose Avancés** :
-   - Configurer des `healthcheck` rigoureux dans `docker-compose.yml` basés sur `/healthz` pour garantir le démarrage séquentiel des services dépendants.
-3. **Sécurité Conteneur (Non-Root User)** :
-   - Exécuter l'application dans le conteneur Docker sous un utilisateur non-privilégié (`appuser`, UID 10001) au lieu de `root`.
+## 4. Observabilité & Monitoring Temps Réel
+- **Exportateur Prometheus (`/metrics`)** : Exposer les métriques clés de performance :
+  - Nombre de requêtes par endpoint et code HTTP (2xx, 4xx, 5xx).
+  - Time To First Token (TTFT) et Inter-Token Latency (TPOT).
+  - Score moyen de sécurité calculé et consommation mémoire VRAM.
+- **Dashboards Grafana** : Créer les modèles JSON de tableaux de bord Grafana pré-configurés pour le monitoring des APIs et GPUs NVIDIA (via `nvidia-dcgm-exporter`).
 
 ---
 
-## 5. Améliorations des Tests Unitaires & Couverture (`tests/`)
+## 5. Benchmarking & Tests de Charge
+- **Suite de Stress Tests Locust** : Rédiger des scénarios de tests de charge Locust (`locustfile.py`) simulant de 100 à 1000 utilisateurs virtuels simultanés.
+- **Quantification des SLI/SLA** : Mesurer et valider le P95 / P99 de latence et le taux de succès (>99.9%) sous saturation.
 
-1. **Mocking Amélioré des Appels Modèles** :
-   - Permettre l'exécution fluide de toute la suite de tests sans nécessiter la présence physique de CUDA ou des poids de modèles lourds (via mocking PyTorch / HuggingFace Transformers).
-2. **Fixtures Pytest Reutilisables** :
-   - Refactoriser la suite de tests pour exploiter pleinement Pytest (fixtures `async_client`, fixtures d'authentification API).
-3. **Calculateur de Couverture (Coverage Code)** :
-   - Intégrer `pytest-cov` dans le workflow CI GitHub Actions avec un seuil minimal de couverture de code garanti à 85%+.
+---
+
+## 6. Gestion Standardisée des Erreurs Utilisateur
+- **Conformité RFC 7807 (Problem Details)** : Formater toutes les réponses d'erreur HTTP au format JSON standardisé RFC 7807 (`type`, `title`, `status`, `detail`, `instance`).
+- **Validation Strictes des Payloads** : Limiter la taille maximale des payloads (ex: Max 5 Mo / 50 000 lignes de code) avec retour HTTP 413 Payload Too Large.
+- **Messages d'Erreur Explicites** : Traiter proprement les cas de langages non supportés (422), clés expirées (401/403) et dépassement de quotas (429 Too Many Requests).
+
+---
+
+## 7. Versioning & Registre MLOps
+- **Registre de Modèles & MLflow** : Traquer l'ensemble des adaptateurs LoRA fine-tunés avec MLflow Model Registry et Git LFS.
+- **Versioning Sémantique (SemVer)** : Appliquer une numérotation stricte (ex: `v1.0.0-lora-cybercode`) avec fichier `CHANGELOG.md` dédié aux poids et hyperparamètres d'entraînement.
+
+---
+
+## 8. Scalabilité Kubernetes (K8s) & Multi-GPU
+- **Manifestes K8s / Helm Charts** : Fournir des configurations Deployment, Service et Ingress pour Kubernetes.
+- **Auto-scaling Horizontal (KEDA / HPA)** : Scaler dynamiquement les pods de serving d'API et d'inférence GPU en fonction de la longueur de la file d'attente et du GPU Duty Cycle.
+
+---
+
+## 9. Plan de Secours et Stratégie de Sortie (Exit Strategy)
+- **Couche d'Abstraction Model Engine** : Concevoir une interface unifiée (`BaseModelProvider`) isolant le code métier des spécificités du modèle sous-jacent.
+- **Plan de Migration / Fallback Transparent** : Permettre un basculement instantané par variable d'environnement (`FALLBACK_MODEL_PROVIDER`) vers un modèle alternatif open-source (ex: Qwen2.5-Coder ou Mistral) si nécessaire.
