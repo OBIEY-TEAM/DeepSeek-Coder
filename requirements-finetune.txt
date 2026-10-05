@@ -1,0 +1,6 @@
+-r requirements.txt
+deepspeed>=0.14.0
+peft>=0.10.0
+bitsandbytes>=0.43.0
+datasets>=2.18.0
+scipy
