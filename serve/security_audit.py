@@ -1,6 +1,5 @@
-import json
 import re
-from typing import Dict, List, Any, Optional
+
 from pydantic import BaseModel, Field
 
 CYBERCODE_SECURITY_SYSTEM_PROMPT = """\
@@ -19,7 +18,7 @@ class VulnerabilityItem(BaseModel):
 class SecurityAuditReport(BaseModel):
     language: str
     security_score: int = Field(ge=0, le=100, description="Overall security score out of 100.")
-    vulnerabilities: List[VulnerabilityItem] = Field(default_factory=list)
+    vulnerabilities: list[VulnerabilityItem] = Field(default_factory=list)
     summary: str = Field(description="Executive summary of the security analysis.")
 
 class SecurityAuditor:
@@ -77,7 +76,7 @@ class SecurityAuditor:
         Performs static heuristic analysis on code and generates a structured report.
         """
         lines = code.split("\n")
-        vulnerabilities: List[VulnerabilityItem] = []
+        vulnerabilities: list[VulnerabilityItem] = []
 
         for line_num, line in enumerate(lines, start=1):
             for rule in self.rules:

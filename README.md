@@ -1,9 +1,20 @@
 <p align="center">
-<img width="1000px" alt="DeepSeek Coder" src="pictures/logo.png">
+<img width="1000px" alt="CyberCode Studio" src="pictures/logo.png">
 </p>
-<p align="center"><a href="https://www.deepseek.com/">[<img src="pictures/home.png" width="20px"> Homepage]</a> | <a href="https://chat.deepseek.com/">[🤖 Chat with DeepSeek Coder]</a> | <a href="https://huggingface.co/deepseek-ai">[🤗 Models Download]</a> | <a href="https://discord.gg/Tc7c45Zzu5">[Discord]</a> | <a href="https://github.com/guoday/assert/blob/main/QR.png?raw=true">[WeChat (微信)]</a></p>
 <p align="center">
-  <a href="https://huggingface.co/papers/2401.14196"><b>Paper Link</b>👁️</a>
+  <a href="https://cybercode.studio">[🌐 CyberCode Studio]</a> |
+  <a href="https://linkedin.com/company/cybercode-studio">[💼 LinkedIn]</a> |
+  <a href="https://wa.me/24206000000">[💬 WhatsApp Business]</a> |
+  <a href="mailto:contact@cybercode.studio">[✉️ Direct Email]</a> |
+  <a href="https://github.com/CyberCode-Studio/deepseek-coder-cybercode/discussions">[💬 GitHub Discussions]</a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/CI%2FCD-Passing-brightgreen" alt="CI Status">
+  <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License">
+  <img src="https://img.shields.io/badge/Python-3.11%20%7C%203.12-blue" alt="Python Version">
+  <img src="https://img.shields.io/badge/Model%20Lock-DeepSeek--Coder%20V1-orange" alt="Model Lock">
+  <img src="https://img.shields.io/badge/Docker-Ready-blue" alt="Docker Ready">
 </p>
 <hr>
 
@@ -17,8 +28,50 @@
 3. **Automated Security Audit & Code Review Server** (`serve/security_audit.py`, `serve/api_server.py`)
 4. **OpenAI V1 Compatible API Server** (`serve/api_server.py`)
 5. **High-Performance vLLM Support** (`serve/vllm_server.py`)
-6. **Containerized Production & Docker Compose** (`Dockerfile`, `docker-compose.yml`)
+6. **Containerized Production & Docker Compose** (`Dockerfile`, `docker-compose.yml`, `docker-compose.prod.yml`)
 7. **CI/CD & Security Review Pipeline** (`.github/workflows/ci.yml`, `tests/`)
+
+---
+
+### Quickstart Docker (5 Minutes)
+
+Lancer l'API sécurisée compatible OpenAI et la démo Web CyberCode Studio avec Docker :
+
+```bash
+# 1. Configurer les variables d'environnement
+cp .env.example .env
+
+# 2. Lancer la pile complète via Docker Compose
+docker-compose up -d --build
+
+# 3. Tester le point de terminaison d'audit de sécurité
+curl -X POST http://localhost:8000/v1/security/audit \
+  -H "Authorization: Bearer cybercode-secret-key-change-in-production" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "code": "SELECT * FROM users WHERE username = '\''" + input_user + "'\'';",
+    "langage": "python"
+  }'
+```
+
+---
+
+### Estimation des Coûts en FCFA (XAF) / EUR
+
+| Postes de Dépenses | Estimation en Euros (€) | Estimation en FCFA (XAF) |
+| :--- | :--- | :--- |
+| **VPS GPU Cloud Prod (NVIDIA A10G / RTX 4090)** | 150 € - 300 € / mois | ~100 000 FCFA - 200 000 FCFA / mois |
+| **Stockage NVMe Sécurisé (500 Go Chiffré)** | ~30 € / mois | ~20 000 FCFA / mois |
+| **Bande passante, Trafic API & Domaines** | ~20 € / mois | ~13 000 FCFA / mois |
+| **Total Mensuel Estimé** | **200 € - 350 € / mois** | **~133 000 FCFA - 233 000 FCFA / mois** |
+
+---
+
+### Gouvernance, Conformité & Documentation
+
+- **Gouvernance**: [CONTRIBUTING.md](CONTRIBUTING.md) | [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | [SECURITY.md](SECURITY.md) | [CHANGELOG.md](CHANGELOG.md) | [ROADMAP.md](ROADMAP.md)
+- **Conformité & Éthique**: [PRIVACY.md](PRIVACY.md) | [TERMS.md](TERMS.md) | [COMPLIANCE.md](COMPLIANCE.md) | [MODEL_CARD.md](MODEL_CARD.md) | [DATASHEET.md](DATASHEET.md) | [ETHICS.md](ETHICS.md) | [SBOM.json](SBOM.json)
+- **Opérationnel**: [ACKNOWLEDGMENTS.md](ACKNOWLEDGMENTS.md) | [FAQ.md](FAQ.md) | [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | [PERFORMANCE.md](PERFORMANCE.md) | [SECURITY_AUDIT_REPORT.md](SECURITY_AUDIT_REPORT.md) | [DISASTER_RECOVERY.md](DISASTER_RECOVERY.md) | [INCIDENT_RESPONSE.md](INCIDENT_RESPONSE.md) | [SLA.md](SLA.md) | [SUPPORT.md](SUPPORT.md)
 
 ---
 

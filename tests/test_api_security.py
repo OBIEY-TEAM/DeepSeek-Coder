@@ -1,6 +1,9 @@
 import unittest
+
 from fastapi.testclient import TestClient
-from serve.api_server import app, API_KEY
+
+from serve.api_server import API_KEY, app
+
 
 class TestApiSecurity(unittest.TestCase):
     """

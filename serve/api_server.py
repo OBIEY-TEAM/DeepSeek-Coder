@@ -1,12 +1,11 @@
 import hashlib
 import os
 import time
-from typing import List, Optional, Union, Dict, Any
 
-from fastapi import FastAPI, Depends, HTTPException, Security, Request, status
+import uvicorn
+from fastapi import Depends, FastAPI, HTTPException, Request, Security, status
 from fastapi.security import APIKeyHeader
 from pydantic import BaseModel, Field
-import uvicorn
 
 from serve.security_audit import SecurityAuditor, SecurityAuditReport
 
@@ -28,9 +27,9 @@ app = FastAPI(
 api_key_header = APIKeyHeader(name="Authorization", auto_error=False)
 
 # Rate limiting storage: {client_identifier: [(timestamp1), (timestamp2)]}
-rate_limit_store: Dict[str, List[float]] = {}
+rate_limit_store: dict[str, list[float]] = {}
 
-async def verify_api_key(api_key: Optional[str] = Security(api_key_header)):
+async def verify_api_key(api_key: str | None = Security(api_key_header)):
     if not api_key:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -77,10 +76,10 @@ class ChatMessage(BaseModel):
 
 class ChatCompletionRequest(BaseModel):
     model: str = MODEL_ID
-    messages: List[ChatMessage]
-    temperature: Optional[float] = 0.7
-    top_p: Optional[float] = 0.95
-    max_tokens: Optional[int] = 1024
+    messages: list[ChatMessage]
+    temperature: float | None = 0.7
+    top_p: float | None = 0.95
+    max_tokens: int | None = 1024
 
 class ChatCompletionChoice(BaseModel):
     index: int
@@ -92,14 +91,14 @@ class ChatCompletionResponse(BaseModel):
     object: str = "chat.completion"
     created: int = Field(default_factory=lambda: int(time.time()))
     model: str = MODEL_ID
-    choices: List[ChatCompletionChoice]
+    choices: list[ChatCompletionChoice]
 
 class CompletionRequest(BaseModel):
     model: str = MODEL_ID
     prompt: str
-    max_tokens: Optional[int] = 512
-    temperature: Optional[float] = 0.2
-    top_p: Optional[float] = 0.95
+    max_tokens: int | None = 512
+    temperature: float | None = 0.2
+    top_p: float | None = 0.95
 
 class CompletionChoice(BaseModel):
     text: str
@@ -111,20 +110,20 @@ class CompletionResponse(BaseModel):
     object: str = "text_completion"
     created: int = Field(default_factory=lambda: int(time.time()))
     model: str = MODEL_ID
-    choices: List[CompletionChoice]
+    choices: list[CompletionChoice]
 
 class SecurityAuditRequest(BaseModel):
     code: str
-    langage: Optional[str] = "auto"
+    langage: str | None = "auto"
 
 class CodeReviewRequest(BaseModel):
     diff: str
-    langage: Optional[str] = "auto"
+    langage: str | None = "auto"
 
 class SecureCodeGenerateRequest(BaseModel):
     task: str
     langage: str = "python"
-    security_requirements: Optional[List[str]] = Field(
+    security_requirements: list[str] | None = Field(
         default=["input_validation", "output_escaping", "parameterized_queries", "secure_error_handling"]
     )
 
