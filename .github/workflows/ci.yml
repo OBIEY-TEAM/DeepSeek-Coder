@@ -22,7 +22,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip setuptools wheel
-          pip install ruff pytest httpx fastapi pydantic uvicorn
+          pip install ruff pytest httpx fastapi pydantic uvicorn numpy transformers torch --extra-index-url https://download.pytorch.org/whl/cpu
 
       - name: Run Ruff Linting
         run: |
@@ -30,7 +30,7 @@ jobs:
 
       - name: Run Unit & Non-Regression Tests
         run: |
-          pytest tests/ -v
+          PYTHONPATH=. pytest tests/ -v
 
       - name: Security Audit Check on PR Diff
         if: github.event_name == 'pull_request'
