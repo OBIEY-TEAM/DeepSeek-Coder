@@ -1,131 +1,202 @@
-# NOM DU PROJET ET PRESENTATION GENERALE
+# SPÉCIFICATIONS TECHNIQUES ET ARCHITECTURE GLOBALE DU PROJET CYBERSOCLE
 
-LE NOM DU PROJET C' EST CYBERSOCLE
-CE PROJET EST POUR LE MOMENT LLM, JE VEUX QUE CA SOIT UN PROJET HYBRIDE.
-Considere un docker comme un bateau.
-Le nombre des bâteau est cinq 5 OFFICIEL + PRISON + MODELE + SCIENCE + TEST.
-Au redemarrage du VPS n'efface aucune donnée des bateaux,
+---
 
-# ARCHITECTURE DES BATEAUX, VLAN ET RESEAU PRIVE
+## 1. PRÉSENTATION GÉNÉRALE ET VISION DU PROJET
 
-Une cellule, un container.
-L'usine qui fait les bîtes, Docker Engin/ le demon Docker.
-C'est la machine qui fabrique les cellules.
-Le bateau où les cellules sont réliés, le réseau virtuel (docker network), c'est le fil invisible qui relie les cellules.
-Couper le lien entre deux cellule, micro segmentation quarantaire.
-Creer des vlan pour mettre des mur entre les différents bateau.
-Communication inter vlan pas d'internet via vlan.
-Les bateaux MODELE + SCIENCE + TEST doivent etre offline pas d'internet juste des liens offlines entre le bateau MODELE avec le bateau OFFICIEL et le bateau PRISON, lien entre bateau MODELE et bateau SCIENCE pas de liens supplementaires entre bateaux.
-Creer 1 réseau qui s'appelle reseau-prive et lui dire internal:true pour la connexion entre les bateaux.
-Dans le projet applique la regle du moindre privillège.
+**CYBERSOCLE** est une plateforme hybride de cyber-sécurité (mêlant micro-segmentation réseau eBPF, conteneurisation immuable et durcie, passerelle SSH de déception, pot de miel/honeypot dynamique, EDR sidecar, registre de logs immuable Merkle Ledger, intelligence artificielle locale LLM hors-ligne, analyse vectorielle Qdrant, et validation formelle de vaccins de sécurité).
 
-# SPECIFICATIONS DES CELLULES (CONTENEURS IMMUABLES, CGROUPS & FIRECRACKER)
+### Concept Fondateur des 5 Bateaux
+Dans l'architecture CYBERSOCLE, une enclave d'infrastructure isolée est désignée par l'analogie d'un **Bateau**.
+Chaque environnement CYBERSOCLE (qu'il s'agisse du VPS d'une Entreprise Cliente ou du VPS LAB Central dirigé par OBIEY Christ Dany) est strictement découpé en **5 Bateaux principaux** :
+1. **Bateau OFFICIEL** : Zone de production pour les conteneurs/cellules des utilisateurs légitimes (`mike-vrai`).
+2. **Bateau PRISON** : Zone de quarantaine sandbox / pot de miel (honeypot) pour isoler les attaquants, fichiers malveillants et sessions de comptes suspects (`mike-faux`).
+3. **Bateau MODELE** : Container maître hybride hébergeant le LLM principal en mode hors-ligne (`offline-first`). Il dispose d'un accès en **lecture seule strict** (`--read-only`, `tmpfs`) sur les volumes de bases de données.
+4. **Bateau SCIENCE (Threat-Intel-Lab)** : Container hébergeant la base vectorielle Qdrant et le moteur d'apprentissage Python. Relié **uniquement** au Bateau MODELE via un réseau privé restreint (`internal: true`).
+5. **Bateau TEST** : Zone d'expérimentation isolée permettant de tester la viabilité, la syntaxe (AST), la sécurité (Bandit) et l'impact de performance des vaccins de sécurité générés.
 
-La cellule, une petite boîte linux.
-L'utilisateur croit qu'il a un vrai pc, mais c'est une boîte légère.
-Il a son propre nim, propre mot de passe ssh, propre dossier.
-L'utilisateur dedans peut tout casser, le serveur ne risque rien.
-Isolation, 2 technologies qui s'appellent Namespaces + Cgroups.
-Namespaces dit tu ne vois que ta boîte.
-Cgroups dit tu ne peux utiliser que 2Go de ram pas plus.
-La boîte très solide en béton, une micro cellule (firecracker), pareil qu'une cellule mais 100% coffre fort.
-Plus lours, même un virus tres fort ne peut pas sortir le clone fausse de la cellule vrai.
-La cellule clone fausse du vrai a une base de données generer aleatoires avec fosses données fausse pdf et images, dossiers et programmes très legère moins de RAM.
-La cellule coffre-fort avec base de donnée ai et agent ia est codé en dur.
-Le vrai nom c'est conteneur immuable et durci.
-Pourque aucun virus ne puisse y rentrer, fais 3 choses 1= Système en lecture seule: docker run--read--only 2=Pas deporte d'entrée: on coupe le ssh on coupe internet entrant il n'accepte que le tuyau de logs qui arrive on le met sur un reseau isolé 3=Distroles: on enlève tout pas de bash pas de apt juste la base de donnée ia avec petit agent ia.
+---
 
-# AUTHENTIFICATION UTILISATEUR, MIKE-VRAI ET MIKE-FAUX (DECEPTION ET HONEYPOT)
+## 2. ARCHITECTURE DÉTAILLÉE DES BATEAUX, VLAN ET RÉSEAU PRIVÉ
 
-Le client se connecte au bateau officiel via une connexion ssh precisement à une cellule (conteneur) qui lui est attribuer.
-Ajoute une logique également pour la connexion d'un utilisateur par exemple mike-vrai et mike-faux pour se connecter autorise les identifiants corrects de se connecter si mike se connecte verifie s'il a une cle de chiffrement valide qui lui est fourni sur son vrai poste de travail en local le mike-vrai en a mais le mike-faux n'a pas autorise le mike-faux a se connecter à une cellule clone avec des fausse données de mike dans le bateau prison par default et le vrai mike a continuer sans travail tous les faux-mike auront acces à la meme fausse à chaque connexion et reconnexion cellule de mike seul le vrai mike aura access a la vrai cellule mike.
-Sur le bateau prison le mike-faux est notre hacker du systeme la cellule agent ia genere la cybercartographie apres attache et la cellule log& espion surveille toutes actions durant l'isolation.
-Dans ces cellules où se connecte les client vrai et faux met des navigateurs.
-Les clients utilisent ses navigateurs par default un emploiyé se connecte à l'application de son entreprise la connexion est dirigee via ssh vers la cellule sur le navigateur via se navigateur il a access au ressources de sont entreprise via VPN une connexion VPS entre cette cellule saine et les ressources distants locaux de l'entreprise mais la cellule affectée n'a pas ce accèss VPN a seulement access ssh entre utilisateur et la cellule.
+### Spécification des Réseaux Docker & Micro-segmentation eBPF
+- **Nom du Réseau Virtuel Privé** : `reseau-prive`
+- **Configuration Docker Compose** :
+  - `driver: bridge`
+  - `internal: true` (Bloque tout accès internet direct sortant/entrant pour MODELE, SCIENCE et TEST).
+  - Inter-Container Communication (ICC) désactivé par défaut (`com.docker.network.bridge.enable_icc: false`).
+- **Plage IP Statique Dédiée** :
+  - Passerelle réseau : `172.28.0.1`
+  - Bateau OFFICIEL : `172.28.0.10`
+  - Bateau PRISON : `172.28.0.20`
+  - Bateau MODELE : `172.28.0.30`
+  - Bateau SCIENCE : `172.28.0.40`
+  - Bateau TEST : `172.28.0.50`
+- **Micro-segmentation eBPF Cilium CNI** :
+  - Application de règles de filtrage au niveau du noyau Linux (L3/L4/L7).
+  - Le Bateau SCIENCE ne peut communiquer **qu'avec le Bateau MODELE**. Tout autre trafic est rejeté au niveau eBPF.
+  - Le Bateau MODELE peut lire les données d'OFFICIEL, PRISON et communiquer avec SCIENCE via API interne exclusive.
 
-# LOGGING, SIDECAR ET SURVEILLANCE DES ATTAQUES
+---
 
-Chaque petit agent a aussi sa base de données, donc il y a la base de données des logs et la base de données des petits agents.
-Les logs des actions de chaque cellule du systeme dois etre mise dans une base de donnee log dedié pour cette cellule.
-Chaque cellule OFFICIEL est connecter à une cellule de lecture, une cellule de log & espion et à une cellule petit agent ia qui est uniquement assistant et regarde les faits et redige les cybercartographies et enregistre dans leurs propre base de donnee db-agent-ai respectives.
-Met un petit espion collé à l'exterieur de la boîte que mike-vrai et celle que mike-faux utilisent qui lit ce qui se passe à l'intérieur.
-En docker ça s'appelle un sidecar.
-Il lit les logs sans jamais rentrer dedans: cet espion est tout^petit, il prend 20 Mo de Ram.
-Tu tuyau qui envoie les logs, doit être à sens unique, comme une valve.
-La boîte ne peut pas parler à la base de données logs.
-C'est l'espion dehors qui passe les logs vers la base de données logs.
-On fait ca avec rsyslog ou fluent-bit.
-Le virus dans la boîte ne voit même pas le tuyau.
-Vérification constant des programmes malveillants sur les cinq bateaux par default et creer des logs des bases de donnees logs pour chaque bateau également et creation d'une cybercartographie en cas d'attaque d'un bateau.
+## 3. SPÉCIFICATIONS DES CELLULES (CONTENEURS IMMUABLES, CGROUPS & FIRECRACKER)
 
-# PETITS AGENTS ET BATEAU MODELE (LLM EN LECTURE SEULE)
+### Anatomie d'une Cellule
+Une **Cellule** désigne un conteneur Linux géré par le démon Docker Engine / `containerd`.
 
-Des petit agents ia connecter au LLM via lien sans internet(offline fist) deployés sur le bateau officiel et sur le bateau prison.
-Les petits agents qui sont dans les bateaux OFFICIEL et PRISON ne sont pas des ia ce sont juste des petits programmes tout leger qui posent des questions au gros bateau MODELE.
-Les petits agents ne parlent pas entre eux.
-Un bateau modele avec access à toutes les bases de données du bateau officiel et du bateau prison.
-Le MODELE a access aux bases de données des logs et des petits agent ia des bateaux OFFICIEL et PRISON.
-Le bateau MODELE contient est le seul container qui contient le LLM montage de tous les volumes de bases de donées en lectures seule -only: volume OFFICIEL db prod-cluster, volume PRISON db quarantaire-sandbox, volume logs DB, volume agents DB.
-Lancement en mode filesystem read-only tmpfs pour empêcher toute modification par un virus.
+### Directives de Durcissement et d'Isolation
+1. **Namespaces & Cgroups v2** : Isolation stricte des vues processus/réseau et limite mémoire maximale imposée à 2 Go RAM par cellule.
+2. **Mode Rootless Docker** : Le démon Docker et les conteneurs tournent en mode non-privilégié sans droits root sur l'hôte VPS.
+3. **Profils Seccomp & AppArmor / SELinux** :
+   - Blocage des appels système critiques (`ptrace`, `sys_admin`, `kexec_load`, `unshare`, `module_load`).
+4. **Système de Fichiers Immuable** :
+   - Montage du système de fichiers racine en lecture seule (`docker run --read-only`).
+   - Utilisation de volumes temporaires `tmpfs` non-persistants pour les opérations temporaires requises.
+5. **Micro-cellules Coffre-fort (MicroVMs Firecracker / Kata Containers)** :
+   - Pour le Bateau PRISON et les cellules isolées d'utilisateurs suspects, l'exécution s'effectue au sein d'une micro-VM Firecracker / KVM ultra-légère (démarrage < 100 ms) offrant une étanchéité matérielle contre les évasions de noyau (kernel breakout).
 
-# ISOLATION DES INCIDENTS, CLONAGE DE CELLULE ET REGENERATION DU BATEAU PRISON ET OFFICIEL
+---
 
-La cellule isolé reste allumée,elle fonctionne.
-Quand un virus ou un fichier programme ou autre truc malveillant est envoyé dans une cellule du bateau malveillant où l'utilisateur est connecté via ssh une alarme est déclenché puis cette cellule des déliée des autres puis la copie de cette cellule est creer dans le bateau prison la cellule officielle affectée est détruite l'utilisateur connecté est redirigé vers le clone de la cellule affecté qui est isolé dans le bateau PRISON.
-Couper le lien, ne touche pas à la boîte, coupe juste le network puis clone la cellule vers PRISON et detruit la boite affectée qui est dans OFFICIER.
-dès évasions d'un virus ou programme malveillant ou du mike-faux de sa cellule isolée vers le bateau PRISON le systeme genere un deuxieme bateau PRISON à l'état sain avant affectation clone toutes les cellules isolé dans la nouvelle prison sauf celle ou l'attaquant s'est évadé puis la cybercatographie actuel de la cellule de ce attaquant est envoyé dans le bateau SCIENCE puis l'ancien bateau de PRISON est détruite.
-En cas d'affectation d'un bateau OFFICIEL genere un deuxieme bateau OFFICIEL clone à l'état sain avant affectation avec toutes les cellule sauf la cellule affecté puis la connexion SSH de ce client reste bloqué une alert est envoyé à l'entreprise client pour ce utilisateur la cellule affecté est cloné dans Prison une cellule clone à l'état sain avant affectation de ce client est genere dans OFFICIEL est les dix premières accèss SSH à cette nouvelle cellules doivent etre validées par double authentification, la premiere reconnexion doit etre validée par l'entreprise cliente.
-La regeneration  à l'état sain précédent avant attaque MODELE, du bateau SCIENCE  en cas d'attaque.
+## 4. AUTHENTIFICATION SÉCURISÉE, MIKE-VRAI VS MIKE-FAUX ET DÉCEPTION HONEYPOT
 
-# CYBERCARTOGRAPHIE, CYBERCARDS ET SIGNATURE SHA256
+### Gateway Proxy SSH Dynamique
+- **Mécanisme d'Authentification Multi-Niveaux** :
+  1. **Identifiants classiques** : Nom d'utilisateur et mot de passe (ex: `mike` / `mike_secure_pass_2025`).
+  2. **Clé de chiffrement locale** : Vérification de la présence d'une clé RSA/Ed25519 spécifique issue du vrai poste de travail.
+  3. **Attestation Matérielle TPM 2.0 / mTLS** : Vérification de la signature cryptographique TPM et de la citation PCR.
+  4. **Agent IA d'Analyse Comportementale** : Évaluation de la vitesse de frappe, de la vélocité des commandes, des heures de connexion et des appels système.
 
-Une fois que bateau modele a acces aux deux autres bateaux, il creer des cybercard, des cybercartographies.
-Par exemeple s'il y a une attaque, il cartographie l'attaque, il cartographie les recommandations, il cartographie la sécurité appliquée et il cartographie les actifs.
-A la fin, le modele lui-même crée un cybercatographie.
-Une fois qu'il y a attaque et isolation d'une cellule, considere une cellule est un conteneur, il genere la cybercatographie avant l'isolation de la cellule et il envoi dans le 4e bateau science cyber intelligent.
-Une fois que le bateau modele a accs aux deux autres bateaux il crée des cybercards, des cybercartographie.
-en cas d'attaque il cartographie l'attaque, catographie la sécurité appliqué et il cartographie les actifs.
-Chaque cybercartographie est un document json modulaire et réutilisables découpé en quatres parties: cybercard attaque pour detaillé l'attaque le type et le vecteur d'entrée, cybercard actifs pour les fichiers et autres actifs z, cybercard securité pour la sécurité appliquée au moment de l'attaque, cybercard recommandation pour les actions à faire.
-Chaque cybercard est signé avec un hash SHA256 au moment de sa création par le bateau MODELE.
-Verification de signature côté bateau science, rejet si invalide.
-Une fois que la cellule est dans le bateau PRISON, il récupère aussi les logs, comment se comporte le virus et tout, il crée aussi une cybercartographie après attaque là bas il y a aussi des nouvlles attaques qui apparaissent, des recommandations la sécuritéappliquée, la cartographie des actifs, il prend ça et il crée une deuxieme cartographie.
-Dans cette cartographie il ajoute aussi la definition des objectifs des prochaines actions.
+### Routage Dynamique de Déception
+- **Cas `mike-vrai`** :
+  - Conditions : Mot de passe valide + Clé locale valide + Attestation TPM conforme + Score d'anomalie comportementale < 0.60.
+  - Action : Redirection vers sa cellule de travail saine dans le Bateau OFFICIEL avec accès aux ressources distantes de l'entreprise via tunnel VPN.
+- **Cas `mike-faux`** :
+  - Conditions : Identifiants valides mais absence de clé locale OU attestation TPM invalide OU comportement suspect (score IA >= 0.60).
+  - Action : Redirection transparente vers une cellule clone isolée dans le Bateau PRISON avec fausses données (honeypot). Tous les `mike-faux` accèdent à cette même cellule leurre. Le VPN entreprise leur est strictement refusé.
+- **Honeypot Dynamique LLM & Canary Tokens** :
+  - Faux documents d'entreprise (PDF, Excel) générés dynamiquement par le LLM.
+  - Insertion de Canary Tokens (clés API/AWS fictives piégées). Toute tentative d'utilisation d'une clé canary déclenche l'alerte d'isolation maximale.
 
-# BATEAU SCIENCE (THREAT-INTEL-LAB) ET BATEAU TEST
+---
 
-Il existe un 4e bateau: bateau science cyber intelligent qui est relié uniquement au bateau modèle.
-Le bateau SCIENCE est pour la science cyber intelligent relier uniquement à bateau MODELE.
-Bateau SCIENCE pour science cyber intelligente en technique c'est threat-intel-lab.
-C'ets le container-4-science qui contient une base vectorielle Qdrant et le moteur d'apprentissage python.
-Il est relié uniquement au bateau modélèle via un réseau docker interne internal true sans access internet, sans bridge vers l'exterieur.
-Aucun autre container ne peur lui parler.
-Communication via API interne exclusive entre container-3 et container-4.
-Dans le bateau science cyber intelligence, il commence à créer des modèles, des cartes.
-Ces modèles permettent de faire ressortir les futurs objectifsde sécurité, les futurs objectifs de sécyurité, les futurs objectifs de sécurité, les futures évaluations des menaces et des vulnérabilité, les futures méthodes pour déterminer les risques et définir les mesures de sécurité et leur mise en oeuvre.
-Cette cybercartographie se découpe en plusieurs morceaux appelés cybercard.
-Et avec ça il commence à s'entrainer pour proposer de nouvelles mesures de securité, de nouveaux schémas de sécurité.
-il crée ça dans le bateau SCIENCE.
-Le bateau SCIENCE fais ressortir des outils qui vont appliquer la sécurité, dont le script , des programmes du code qui va renforcer la sécurité actuelle des cellules et des cinq bateaux.
-Il y a un test de la solution genere sur le bateau TEST apres test positif, il y a une demande humaine de l'admin de sécurité de l'entreprise client depuis local via VPN.
-La regeneration à l'état initiale du bateau TEST apres tout tests.
+## 5. LOGGING UNIDIRECTIONNEL, SIDECAR FALCO ET MERKLE LEDGER
 
-# INTERFACE GRAPHIQUE ET VALIDATION HUMAINE DE SECURITE
+### Architecture Sidecar
+- **Sidecar Espion Falco (eBPF)** :
+  - Chaque cellule est accompagnée d'un conteneur sidecar léger (~20 Mo RAM).
+  - Il observe en temps réel les appels système (`syscalls`) depuis l'extérieur du conteneur sans s'y introduire.
+- **Tuyau Unidirectionnel (Valve)** :
+  - Les logs sont expédiés via Rsyslog / Fluent-Bit vers la base de données dédiée (`db-log`). Le conteneur utilisateur ne possède aucun accès direct à la BDD de logs.
+- **Registre de Logs Immuable (Merkle Ledger / RFC 3161)** :
+  - Chaque entrée de log est intégrée dans un Arbre de Merkle (Merkle Tree).
+  - Horodatage qualifié RFC 3161 certifiant l'immuabilité et l'infalsificabilité des preuves cryptographiques.
 
-Creer une application Web réact api backend connexion VPN SSH une cellule admin security  pour la validation humaine.
-Par exemple s'il veut appliquer une recommandation, l'utilisateur à qui appartient la sécurité appui sur un bouton.
-Il y a une app sur ce bouton.
-Le bateau SCIENCE commence à classer les recommandations.
-Si exemple il y a une recommandation et que l'utilisateur humain confirme, il applique.
-Il prend le programme et il le deploie ce ecosysteme afin d'appliquer la nouvelle mesure de sécurité afin que prochainement on ne subisse plus la même attaque.
-Une commande pour un deploiement sur VPS entreprise client et une autre pour deploiement sur VPS LAB.
+---
 
-# ECOSYSTEME MULTI-ENTREPRISES, ARCHITECTURE DU LAB CYBERSOCLE ET DISTRIBUTIONS DE VACCINS
+## 6. MOTEUR LLM EN LECTURE SEULE ET CYBERCARTOGRAPHIE STIX 2.1
 
-Le VPS LAB appartient  l'équipe CYBERSOCLE confondateur OBIEY Christ Dany.
-Chaque entreprise cliente possède son propre cloud SSH avec les cinq bateaux OFFICIEL PRISON MODELE SCIENCE TEST.
-Le VPS LAB possèce également cinq bateaux OFFICIEL PRISON MODELE SCIENCE TEST.
-Connexion VPN entre les bateaux PRISON-entreprises vers le bateau PRISON-LAB, les bateaux SCIENCE-entreprise avec le bateau SCIENCE-LAB, les bateaux TEST-entreprises avec le bateau TEST-LAB.
-Les vacins generees par une entreprise  SCIENCES-entreprise testé positives sont envoyé vers le LAB retester si positif validation humaine de l'équipe de LAB puis envoyé aux autres entreprises si testé positif dans les entreprises respectifs demande de la validation humaine de chauqe entreprise.
-Les attaques surveillé en temps reels PRISON-entreprises transferer dans LAB permettent à creer des vaccins dans SCIENCE-LAB.
-Eviter la redondances des vaccins plus creer le nouveaux et ameliorer les anciens comme mise à jour.
-Apres validation humaine de la version V2 donne la possibilité de repartir aux anciennes par exemple versions V1 V1.0.1 V1.0.2 .
+### Bateau MODELE (LLM Master)
+- **Moteur d'Inférence Optimisé** :
+  - Utilisation de **vLLM / llama.cpp (quantification GGUF 4-bit / 8-bit)** pour garantir un débit > 30 tokens/sec tout en maintenant l'empreinte VRAM sous 8 GB.
+  - Fonctionne en mode 100% hors-ligne (offline-first).
+  - Montage de tous les volumes de bases de données (`db-prod-cluster`, `db-quarantaine-sandbox`, `db-log`, `db-agent-ai`) en **lecture seule strict** (`--read-only`, `tmpfs`).
+
+### Standardisation STIX 2.1 & 4 Cybercards
+Toute Cybercartographie générée par le Bateau MODELE est un document JSON conforme à la norme internationale **STIX 2.1**, découpé en 4 Cybercards modulaires :
+1. `cybercard_attaque` : Type d'attaque, vecteur d'entrée, signature contextuelle (Indicator).
+2. `cybercard_actifs` : Fichiers ciblés, processus affectés, ressources d'entreprise (Infrastructure).
+3. `cybercard_securite` : Mesures de sécurité actives au moment de l'impact (Course-of-action).
+4. `cybercard_recommandation` : Actions correctives et règles du vaccin de sécurité proposé (Course-of-action).
+
+### Signature Cryptographique SHA256
+- Chaque bundle de Cybercartographie est signé avec un hash SHA256 par le Bateau MODELE (`signed_by: BATEAU_MODELE_LLM_MASTER`).
+- Le Bateau SCIENCE vérifie la signature à la réception et rejette automatiquement tout document non conforme.
+
+---
+
+## 7. GESTION DES INCIDENTS, CLONAGE ET RÈGLES DE RÉGÉNÉRATION
+
+### Processus d'Isolation d'une Cellule
+1. **Détection** : Alerte levée par le sidecar Falco ou l'agent IA.
+2. **Micro-segmentation** : Rupture immédiate du lien réseau de la cellule compromise via règle eBPF Cilium.
+3. **Cybercartographie Pré-isolation** : Génération immédiate d'un rapport STIX 2.1 avant neutralisation.
+4. **Clonage & Redirection** : La cellule est clonée vers le Bateau PRISON, la session utilisateur est transparente basculée vers ce clone, et la cellule d'origine dans OFFICIEL est détruite.
+5. **Garde-fou Anti-Épuisement de Ressources** : Seuil maximal imposé sur le nombre de clones actifs (`MAX_PRISON_CLONES = 10`) et le rythme de clonage (`MAX_CLONE_RATE_PER_MIN = 5`) pour empêcher le déni de service de l'hôte VPS.
+
+### Règles de Régénération des Bateaux
+- **Régénération du Bateau OFFICIEL** :
+  - Déclenchée en cas d'infection majeure de l'enclave OFFICIEL.
+  - Génération d'un deuxième Bateau OFFICIEL sain. SSH temporairement bloqué, alerte client transmise.
+  - Double authentification (2FA) obligatoire sur les 10 accès suivants, avec validation explicite par l'entreprise lors du premier accès.
+- **Régénération du Bateau PRISON** :
+  - Déclenchée en cas d'évasion d'un virus ou de `mike-faux` vers l'enclave PRISON.
+  - Génération d'un deuxième Bateau PRISON sain, transfert des cellules non compromises, envoi de la Cybercartographie STIX 2.1 au Bateau SCIENCE, puis destruction de l'ancien Bateau PRISON.
+- **Réinitialisation du Bateau SCIENCE** :
+  - Restauration possible à partir du dernier checkpoint sain enregistré (`v1.0.0`).
+
+---
+
+## 8. BATEAU SCIENCE (THREAT-INTEL-LAB) ET BATEAU TEST (VALIDATION FORMELLE)
+
+### Bateau SCIENCE (Threat-Intel-Lab)
+- Héberge la base vectorielle **Qdrant** et le moteur d'apprentissage Python.
+- Traite les Cybercartographies STIX 2.1 pour faire ressortir les modèles de vulnérabilités, évaluer les risques et construire des scripts/programmes de renforcement ("vaccins").
+
+### Bateau TEST & Pipeline de Validation Formelle
+Chaque vaccin généré fait l'objet d'un pipeline de qualification rigoureux sur le Bateau TEST :
+1. **Analyse Statique de Syntax (AST Python)** : Validation du parsing AST pour éliminer tout bug de syntaxe.
+2. **Analyse de Sécurité Code (Bandit Scanner)** : Interdiction d'instructions dangereuses (`eval`, `exec`, `os.system`).
+3. **Mesure d'Impact de Performance** : Vérification que la surconsommation CPU reste < 2.0% et RAM < 10 Mo.
+4. **Score de Confiance (0.0 à 1.0)** :
+   - Un vaccin avec score >= 0.90 et criticité moyenne/faible est auto-approuvé (`APPROVED_AUTOMATICALLY`).
+   - Les vaccins à criticité `HIGH` ou `CRITICAL` requièrent obligatoirement la validation humaine.
+5. **Rollback Automatique** : En cas de pic d'anomalie post-déploiement (CPU > 85%, taux d'erreur > 5%), le système applique un rollback immédiat.
+6. **Réinitialisation automatique** du Bateau TEST à son état snapshot initial après chaque batterie de tests.
+
+---
+
+## 9. INTERFACE ADMIN WEB REACT / FASTAPI ET GITOPS
+
+### Application Web Admin
+- Backend FastAPI (`cybersocle/web/api_backend.py`) et Interface Web React HTML (`cybersocle/web/ui_app.py`) hébergés dans une cellule restreinte `admin-security` accessible via VPN/SSH.
+- Permet à l'administrateur sécurité d'examiner les vaccins en attente et de valider leur déploiement en 1 clic.
+
+### Gestion GitOps des Politiques de Sécurité
+- Le gestionnaire GitOps (`cybersocle/ecosystem/gitops_manager.py`) maintient l'historique des états de sécurité dans un dépôt Git local (`.cybersocle_gitops`).
+- Chaque vaccin appliqué génère un commit d'état. Un rollback vers toute version antérieure (`V1`, `V1.0.1`, `V2`) s'effectue de manière déterministe via `git revert`.
+
+---
+
+## 10. ÉCOSYSTÈME MULTI-ENTREPRISES ET VPS LAB CYBERSOCLE (OBIEY CHRIST DANY)
+
+### Architecture Globale du LAB CYBERSOCLE
+- Le VPS LAB CYBERSOCLE (propriété de l'équipe CYBERSOCLE et des co-fondateurs OBIEY Christ Dany) possède sa propre instance 5 Bateaux.
+- Connexion VPN sécurisée reliant les bateaux PRISON, SCIENCE et TEST des entreprises clientes aux bateaux PRISON, SCIENCE et TEST du LAB.
+
+### Confidentialité Zero-Knowledge Proofs (ZKP) & Anonymisation
+- **Anonymisation stricte** : Avant toute transmission vers le VPS LAB, le module d'anonymisation nettoie la Cybercartographie STIX 2.1 de toute adresse IP, nom d'utilisateur ou chemin interne entreprise.
+- **Preuves ZKP (Zero-Knowledge Proofs)** : Certification cryptographique prouvant la réalité de l'attaque subie sans dévoiler le contenu confidentiel de l'entreprise.
+
+### Boucle de Circulation des Vaccins
+1. Attaque interceptée sur le Bateau PRISON-Entreprise -> Cybercartographie ZKP transmise au LAB.
+2. Génération/amélioration du vaccin dans SCIENCE-LAB.
+3. Qualification sur Bateau TEST-LAB et validation humaine par l'équipe LAB (OBIEY Christ Dany).
+4. Diffusion aux Bateaux SCIENCE des autres entreprises clientes pour application après validation locale.
+
+---
+
+## 11. COMMANDES DE DÉPLOIEMENT CLI
+
+L'outil CLI `cybersocle/cli.py` permet d'initialiser et de déployer le système selon le rôle de la machine host :
+
+### Déploiement sur VPS Entreprise Cliente :
+```bash
+python -m cybersocle.cli --client
+```
+*Initialise les 5 Bateaux clients, configure le réseau `reseau-prive` avec règles eBPF Cilium, active la passerelle SSH de déception et le pont VPN vers le LAB.*
+
+### Déploiement sur VPS LAB CYBERSOCLE (OBIEY Christ Dany) :
+```bash
+python -m cybersocle.cli --lab
+```
+*Initialise les 5 Bateaux du LAB Central, configure le concentrateur VPN multi-entreprises, le hub d'anonymisation ZKP et le registre global des vaccins.*
