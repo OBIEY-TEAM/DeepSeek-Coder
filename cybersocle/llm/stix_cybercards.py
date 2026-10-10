@@ -86,3 +86,39 @@ class STIXCybercardGenerator:
         cartography["signed_by"] = "BATEAU_MODELE_LLM_MASTER"
 
         return cartography
+
+    def anonymize_cybercard_for_vps_lab(self, cartography: dict[str, Any]) -> dict[str, Any]:
+        """
+        Explicit step for anonymizing STIX Cybercards prior to export/sharing with VPS LAB (Point 8).
+        Removes internal client IPs, usernames, client hostnames, and internal path structures.
+        """
+        import re
+
+        anon = json.loads(json.dumps(cartography))  # Deep copy
+        anon["cell_id"] = "cell-anonymized-vps-lab"
+        anon["ship_name"] = "ENTERPRISE_CLIENT_ANON"
+
+        # Regex filters for IP addresses and user home directories
+        ip_regex = re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}\b")
+        home_path_regex = re.compile(r"/home/[a-zA-Z0-9_\-]+/")
+
+        cards = anon.get("stix_cybercards", {})
+        for card_key, card_val in cards.items():
+            if isinstance(card_val, dict):
+                desc = card_val.get("description", "")
+                desc = ip_regex.sub("[ANONYMIZED_IP]", desc)
+                desc = home_path_regex.sub("/home/anonymized_user/", desc)
+                card_val["description"] = desc
+
+                name = card_val.get("name", "")
+                card_val["name"] = ip_regex.sub("[ANONYMIZED_IP]", name)
+
+        anon["cybercard_anonymized_for_vps_lab"] = True
+        anon["anonymized_by"] = "CYBERSOCLE_LAB_ANONYMIZER_MODULE"
+
+        # Re-sign anonymized bundle
+        if "sha256_signature" in anon:
+            del anon["sha256_signature"]
+        anon["sha256_signature"] = self._compute_sha256_signature(anon)
+
+        return anon
