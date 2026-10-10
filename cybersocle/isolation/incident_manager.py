@@ -8,6 +8,13 @@ from cybersocle.llm.stix_cybercards import STIXCybercardGenerator
 
 
 class IncidentIsolationManager:
+    # Explicit thresholds to distinguish cell isolation vs ship destruction (Point 7)
+    SEVERITY_CELL_ISOLATION = "CELL_ISOLATION"  # Single cell threat / local malware
+    SEVERITY_SHIP_DESTRUCTION = "SHIP_DESTRUCTION"  # Kernel escape, multi-cell cascade, or resource spike
+
+    MAX_PRISON_CLONES = 10
+    MAX_CLONE_RATE_PER_MIN = 5
+
     def __init__(self):
         self.stix_generator = STIXCybercardGenerator()
         self.active_officiel_ships: list[dict[str, Any]] = [
@@ -17,8 +24,53 @@ class IncidentIsolationManager:
             {"ship_id": "ship-prison-1", "status": "HEALTHY", "cells": []}
         ]
         self.science_ship = {"ship_id": "ship-science-1", "status": "HEALTHY", "last_clean_checkpoint": "v1.0.0"}
+        self.cloned_cell_count = 0
+        self.last_clone_timestamps: list[float] = []
+
+    def _check_resource_exhaustion_guard(self) -> bool:
+        """
+        Anti-resource exhaustion guard (Point 7).
+        Prevents attacker from exhausting server RAM/CPU via infinite cell cloning loops.
+        """
+        now = time.time()
+        # Clean timestamps older than 60s
+        self.last_clone_timestamps = [t for t in self.last_clone_timestamps if now - t < 60]
+
+        if len(self.last_clone_timestamps) >= self.MAX_CLONE_RATE_PER_MIN:
+            return False  # Rate limit exceeded
+
+        total_active_prisons = len(self.active_prison_ships[0]["cells"])
+        if total_active_prisons >= self.MAX_PRISON_CLONES:
+            return False  # Max clone capacity reached
+
+        return True
+
+    def evaluate_incident_action(
+        self,
+        incident_type: str,
+        affected_cells: list[str],
+        host_resource_usage_percent: float = 50.0
+    ) -> str:
+        """
+        Evaluates explicit thresholds to decide whether to isolate a single cell or destroy the ship.
+        """
+        if "KERNEL_ESCAPE" in incident_type.upper() or "CONTAINER_BREAKOUT" in incident_type.upper():
+            return self.SEVERITY_SHIP_DESTRUCTION
+
+        if len(affected_cells) >= 3 or host_resource_usage_percent >= 90.0:
+            return self.SEVERITY_SHIP_DESTRUCTION
+
+        return self.SEVERITY_CELL_ISOLATION
 
     def isolate_cell_and_clone_to_prison(self, cell_id: str, user_id: str) -> dict[str, Any]:
+        if not self._check_resource_exhaustion_guard():
+            return {
+                "action": "THROTTLED_ANTI_RESOURCE_EXHAUSTION",
+                "status": "CLONE_CAPACITY_OR_RATE_LIMIT_EXCEEDED",
+                "message": "Resource exhaustion safeguard triggered to prevent host CPU/RAM exhaustion."
+            }
+
+        self.last_clone_timestamps.append(time.time())
         cartography = self.stix_generator.generate_cybercartography(
             cell_id=cell_id,
             ship_name="OFFICIEL",

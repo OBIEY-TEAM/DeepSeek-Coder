@@ -3,20 +3,17 @@ Multi-Enterprise Ecosystem & CYBERSOCLE LAB Bridge (OBIEY Christ Dany).
 """
 
 from typing import Any
+from cybersocle.llm.stix_cybercards import STIXCybercardGenerator
 
 
 class ZeroKnowledgeProofAnonymizer:
     @staticmethod
     def anonymize_cartography(cartography: dict[str, Any]) -> dict[str, Any]:
-        anon_cartography = dict(cartography)
-        anon_cartography["cell_id"] = "cell-anonymized-zkp"
-        anon_cartography["ship_name"] = "ENTERPRISE_CLIENT_ANON"
-
-        if "stix_cybercards" in anon_cartography:
-            cards = anon_cartography["stix_cybercards"]
-            if "cybercard_attaque" in cards:
-                cards["cybercard_attaque"]["description"] = "Anonymized ZKP Attack Signature"
-
+        """
+        Applies explicit cybercard anonymization for VPS LAB sharing (Point 8) + ZKP proofs.
+        """
+        gen = STIXCybercardGenerator()
+        anon_cartography = gen.anonymize_cybercard_for_vps_lab(cartography)
         anon_cartography["zkp_proof"] = "ZKP_PROOF_VALID_ATTACK_OCCURRED_WITHOUT_DATA_LEAK"
         return anon_cartography
 

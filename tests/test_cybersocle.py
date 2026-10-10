@@ -195,6 +195,93 @@ class TestCybersocleSystem(unittest.TestCase):
         lab_deploy = deploy_cybersocle("lab")
         self.assertEqual(lab_deploy["mode"], "LAB_OBIEY_CHRIST_DANY")
 
+    # --- 8. Specific Tests for Architecture Enhancements (Points 1-8) ---
+    def test_vaccine_auto_approval_and_rollback(self):
+        gen = VaccineGenerator()
+        pkg = gen.generate_vaccine("RCE_EXPLOIT", "input_string")
+        validator = FormalVaccineValidator()
+
+        # Medium criticality + high confidence -> Auto approved
+        res = validator.validate_vaccine_on_bateau_test(pkg, criticality="MEDIUM")
+        self.assertEqual(res["status"], "APPROVED_AUTOMATICALLY")
+        self.assertTrue(res["auto_approved"])
+
+        # High criticality -> Human validation required
+        res_high = validator.validate_vaccine_on_bateau_test(pkg, criticality="HIGH")
+        self.assertEqual(res_high["status"], "APPROVED_FOR_HUMAN_VALIDATION")
+        self.assertFalse(res_high["auto_approved"])
+
+        # Post-deployment anomaly rollback
+        rollback_res = validator.rollback_vaccine_on_anomaly(pkg["vaccine_id"], {"cpu_usage_percent": 95})
+        self.assertTrue(rollback_res["rollback_executed"])
+        self.assertEqual(rollback_res["status"], "ROLLED_BACK_AUTOMATICALLY")
+
+    def test_unidirectional_threat_diode(self):
+        from cybersocle.logging.unidirectional_pipe import UnidirectionalThreatDiode
+        diode = UnidirectionalThreatDiode()
+        res = diode.transmit_threat_intel({"stix_cybercards": {"card": 1}})
+        self.assertEqual(res["status"], "TRANSMITTED_UNIDIRECTIONAL")
+        self.assertTrue(res["return_channel_blocked"])
+
+    def test_hot_standby_llm_failover(self):
+        from cybersocle.llm.offline_engine import HotStandbyLLMManager, OfflineLLMEngine
+        llm = OfflineLLMEngine()
+        failover = llm.standby_manager.trigger_hot_failover("TEST_SELF_HEALING")
+        self.assertEqual(failover["status"], "FAILOVER_SUCCESS")
+        self.assertEqual(failover["active_llm"], "core-llm-standby")
+        self.assertIn("core-llm-standby", llm.query_model_offline("Check status"))
+
+    def test_syscall_memory_anonymizer(self):
+        spy = FalcoSidecarSpy(cell_id="c1", ship_name="PRISON")
+        evt = {"type": "execve", "proc_name": "bash", "details": "password=SecretPass123 0x7fff5fbff880 00 11 22 33 44 55"}
+        alert = spy.inspect_syscall_event(evt)
+        self.assertTrue(alert["memory_anonymized"])
+        self.assertNotIn("SecretPass123", alert["details"])
+        self.assertIn("[REDACTED_PASSWORD]", alert["details"])
+
+    def test_hardware_resource_optimization_profiles(self):
+        from cybersocle.llm.offline_engine import OfflineLLMEngine
+        edge_llm = OfflineLLMEngine(profile="EDGE")
+        cfg = edge_llm.get_hardware_resource_config()
+        self.assertEqual(cfg["vram_limit_mb"], 2048)
+
+        edge_opts = ContainerHardening.get_cell_docker_run_security_options(profile="EDGE")
+        self.assertEqual(edge_opts["mem_limit"], "256m")
+
+    def test_behavioral_ai_auth_agent(self):
+        from cybersocle.auth.ssh_proxy import BehavioralAIAuthAgent, SSHAuthenticationGateway
+        gateway = SSHAuthenticationGateway()
+
+        # Bot velocity -> flagged as suspicious -> routed to PRISON honeypot
+        res = gateway.authenticate_and_route(
+            username="mike",
+            password="mike_secure_pass_2025",
+            encryption_key="valid_local_key_abc",
+            tpm_signature="valid_tpm_sig_123",
+            pcr_quote="quote_xyz",
+            session_behavior_metrics={"command_velocity_per_min": 50, "typing_rhythm_ms": 5}
+        )
+        self.assertEqual(res["target_ship"], "PRISON")
+        self.assertTrue(res["honeypot"])
+
+    def test_incident_thresholds_and_anti_exhaustion(self):
+        mgr = IncidentIsolationManager()
+        action1 = mgr.evaluate_incident_action("MALWARE_EXECUTION", ["cell-1"])
+        self.assertEqual(action1, IncidentIsolationManager.SEVERITY_CELL_ISOLATION)
+
+        action2 = mgr.evaluate_incident_action("KERNEL_ESCAPE_ATTEMPT", ["cell-1"])
+        self.assertEqual(action2, IncidentIsolationManager.SEVERITY_SHIP_DESTRUCTION)
+
+    def test_explicit_cybercard_vps_lab_anonymization(self):
+        gen = STIXCybercardGenerator()
+        cart = gen.generate_cybercartography(
+            cell_id="c1", ship_name="OFFICIEL", attack_type="RCE", entry_vector="HTTP",
+            impacted_assets=["/home/mike/secret.txt"], applied_security=["fw"], recommendations=["patch"]
+        )
+        anon = gen.anonymize_cybercard_for_vps_lab(cart)
+        self.assertTrue(anon["cybercard_anonymized_for_vps_lab"])
+        self.assertEqual(anon["cell_id"], "cell-anonymized-vps-lab")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -54,19 +54,31 @@ profile cybersocle-cell-profile flags=(attach_disconnected,mediate_deleted) {
     @staticmethod
     def get_cell_docker_run_security_options(
         is_coffre_fort: bool = False,
-        memory_limit: str = "2g",
-        read_only: bool = True
+        memory_limit: str | None = None,
+        read_only: bool = True,
+        profile: str = "FULL_CLUSTER"
     ) -> dict[str, Any]:
         """
         Generates container runtime options adhering to least privilege & microVM isolation.
+        Optimizes memory and resource limits according to the hardware profile (EDGE, MODEST, FULL_CLUSTER).
         """
+        profile_mem = {
+            "EDGE": "256m",
+            "MODEST": "512m",
+            "FULL_CLUSTER": "2g"
+        }
+
+        effective_mem = memory_limit or profile_mem.get(profile.upper(), "2g")
+
         opts: dict[str, Any] = {
             "read_only": read_only,
+            "profile": profile.upper(),
             "tmpfs": {
-                "/tmp": "rw,noexec,nosuid,size=100m",
-                "/run": "rw,noexec,nosuid,size=50m"
+                "/tmp": "rw,noexec,nosuid,size=32m" if profile.upper() == "EDGE" else "rw,noexec,nosuid,size=100m",
+                "/run": "rw,noexec,nosuid,size=16m" if profile.upper() == "EDGE" else "rw,noexec,nosuid,size=50m"
             },
-            "mem_limit": memory_limit,
+            "mem_limit": effective_mem,
+            "cpu_quota": 25000 if profile.upper() == "EDGE" else 100000,  # 0.25 CPU vs 1.0 CPU
             "cap_drop": ["ALL"],
             "security_opt": [
                 "no-new-privileges:true",
@@ -77,6 +89,6 @@ profile cybersocle-cell-profile flags=(attach_disconnected,mediate_deleted) {
         if is_coffre_fort:
             # Use Kata / Firecracker microVM hypervisor runtime for coffre-fort cells
             opts["runtime"] = "kata-fc"  # Firecracker microVM runtime
-            opts["mem_limit"] = "512m"
+            opts["mem_limit"] = "256m" if profile.upper() == "EDGE" else "512m"
 
         return opts
