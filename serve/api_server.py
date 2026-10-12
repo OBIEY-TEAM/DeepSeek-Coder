@@ -15,12 +15,12 @@ MODEL_ID = os.getenv("MODEL_NAME", "deepseek-ai/deepseek-coder-6.7b-instruct")
 if "v2" in MODEL_ID.lower() or "v3" in MODEL_ID.lower() or "r1" in MODEL_ID.lower():
     raise ValueError("Usage of DeepSeek V2, V3 or R1 models is strictly prohibited. Only V1 models are allowed.")
 
-API_KEY = os.getenv("CYBERCODE_API_KEY", "cybercode-secret-key-2025")
+API_KEY = os.getenv("CYBERSOCLE_API_KEY", "cybersocle-secret-key-2025")
 RATE_LIMIT_PER_MINUTE = int(os.getenv("RATE_LIMIT_PER_MINUTE", "100"))
 
 app = FastAPI(
-    title="CyberCode Studio API - DeepSeek-Coder V1",
-    description="Secure OpenAI-compatible API and Security Engineering endpoints for CyberCode Studio.",
+    title="CYBERSOCLE API - DeepSeek-Coder V1",
+    description="Secure OpenAI-compatible API and Security Engineering endpoints for CYBERSOCLE.",
     version="1.0.0"
 )
 
@@ -87,7 +87,7 @@ class ChatCompletionChoice(BaseModel):
     finish_reason: str = "stop"
 
 class ChatCompletionResponse(BaseModel):
-    id: str = "chatcmpl-cybercode-1"
+    id: str = "chatcmpl-cybersocle-1"
     object: str = "chat.completion"
     created: int = Field(default_factory=lambda: int(time.time()))
     model: str = MODEL_ID
@@ -106,7 +106,7 @@ class CompletionChoice(BaseModel):
     finish_reason: str = "stop"
 
 class CompletionResponse(BaseModel):
-    id: str = "cmpl-cybercode-1"
+    id: str = "cmpl-cybersocle-1"
     object: str = "text_completion"
     created: int = Field(default_factory=lambda: int(time.time()))
     model: str = MODEL_ID
@@ -142,7 +142,7 @@ async def list_models(token: str = Depends(verify_api_key)):
                 "id": MODEL_ID,
                 "object": "model",
                 "created": 1700000000,
-                "owned_by": "CyberCode Studio"
+                "owned_by": "CYBERSOCLE"
             }
         ]
     }
@@ -157,7 +157,7 @@ async def chat_completions(
     log_request_anonymized("/v1/chat/completions", len(full_prompt), full_prompt)
 
     # Simulated response or model call
-    reply_content = f"CyberCode Assistant response for instructions on {MODEL_ID}."
+    reply_content = f"CYBERSOCLE Assistant response for instructions on {MODEL_ID}."
     return ChatCompletionResponse(
         choices=[
             ChatCompletionChoice(
@@ -176,7 +176,7 @@ async def completions(
     log_request_anonymized("/v1/completions", len(req.prompt), req.prompt)
 
     # Handle FIM format if present (<｜fim begin｜> ... <｜fim hole｜> ... <｜fim end｜>)
-    completion_text = "# Generated completion by CyberCode Studio model\npass"
+    completion_text = "# Generated completion by CYBERSOCLE model\npass"
     return CompletionResponse(
         choices=[
             CompletionChoice(text=completion_text)
@@ -204,7 +204,7 @@ async def code_review(
     audit_report = auditor.analyze(code=req.diff, language=req.langage or "auto")
 
     review_summary = (
-        f"### CyberCode Studio Automated Code Review\n\n"
+        f"### CYBERSOCLE Automated Code Review\n\n"
         f"**Security Score**: {audit_report.security_score}/100\n"
         f"**Issues Detected**: {len(audit_report.vulnerabilities)}\n\n"
         f"{audit_report.summary}"

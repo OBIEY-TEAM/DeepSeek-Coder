@@ -1,6 +1,6 @@
-# Contributing to CyberCode Studio DeepSeek-Coder V1
+# Contributing to CYBERSOCLE DeepSeek-Coder V1
 
-Thank you for your interest in contributing to CyberCode Studio!
+Thank you for your interest in contributing to CYBERSOCLE!
 
 ## Guiding Principles
 1. **Strict Lock on DeepSeek-Coder V1**: All changes must exclusively target DeepSeek-Coder V1 model weights (`1.3B`, `6.7B`, `33B`). No references or migrations to V2, V3, or R1 are permitted.

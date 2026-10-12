@@ -99,7 +99,7 @@ PYTHONPATH=. pytest tests/test_niveau1_iam.py -v
 | `tests/test_api_security.py` | 7 | Audit de sécurité FastAPI, authentification par clé API Bearer, protection contre le Rate-Limiting et injection SQL/Commandes. | **PASSED** |
 | `tests/test_cybersocle.py` | 24 | Tests unitaires complets des modules internes `cybersocle/` (auth, network, isolation, logging, llm, science, ecosystem, web). | **PASSED** |
 | `tests/test_security_audit.py` | 4 | Analyseur statique de sécurité du code (`SecurityAuditor`), calcul de score de sécurité et détection d'anti-patterns. | **PASSED** |
-| `tests/test_finetune_cybercode.py` | 3 | Pipeline de fine-tuning LoRA/QLoRA DeepSeek-Coder, masquage de données anonymisées et préparation des datasets. | **PASSED** |
+| `tests/test_finetune_cybersocle.py` | 3 | Pipeline de fine-tuning LoRA/QLoRA DeepSeek-Coder, masquage de données anonymisées et préparation des datasets. | **PASSED** |
 | `tests/test_non_regression.py` | 2 | Tests de non-régression sur le modèle de langage et les prompts de sécurité. | **PASSED** |
 | `tests/test_templates.py` | 2 | Validation du format de gabarit d'instructions et des jetons EOT/FIM. | **PASSED** |
 | `tests/test_tokenizer.py` | 2 | Alignement du vocabulaire, vérification des jetons spéciaux du tokenizer DeepSeek-Coder. | **PASSED** |

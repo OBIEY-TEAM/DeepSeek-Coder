@@ -1,21 +1,21 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.4",
-  "serialNumber": "urn:uuid:cybercode-studio-deepseek-coder-v1-sbom",
+  "serialNumber": "urn:uuid:cybersocle-deepseek-coder-v1-sbom",
   "version": 1,
   "metadata": {
     "timestamp": "2025-01-01T00:00:00Z",
     "tools": [
       {
-        "vendor": "CyberCode Studio",
+        "vendor": "CYBERSOCLE",
         "name": "Software Bill of Materials Generator"
       }
     ],
     "component": {
       "type": "application",
-      "name": "cybercode-deepseek-coder",
+      "name": "cybersocle-deepseek-coder",
       "version": "1.0.0",
-      "description": "CyberCode Studio customized DeepSeek-Coder V1 platform for sovereign AI code security and auditing."
+      "description": "CYBERSOCLE customized DeepSeek-Coder V1 platform for sovereign AI code security and auditing."
     }
   },
   "components": [

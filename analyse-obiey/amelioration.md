@@ -1,6 +1,6 @@
-# Propositions d'Améliorations - CyberCode Studio (DeepSeek-Coder V1)
+# Propositions d'Améliorations - CYBERSOCLE (DeepSeek-Coder V1)
 
-Ce document présente une feuille de route détaillée des améliorations techniques, architecturales et opérationnelles proposées pour le projet **CyberCode Studio**, organisées autour des 9 axes stratégiques.
+Ce document présente une feuille de route détaillée des améliorations techniques, architecturales et opérationnelles proposées pour le projet **CYBERSOCLE**, organisées autour des 9 axes stratégiques.
 
 ---
 
@@ -49,7 +49,7 @@ Ce document présente une feuille de route détaillée des améliorations techni
 
 ## 7. Versioning & Registre MLOps
 - **Registre de Modèles & MLflow** : Traquer l'ensemble des adaptateurs LoRA fine-tunés avec MLflow Model Registry et Git LFS.
-- **Versioning Sémantique (SemVer)** : Appliquer une numérotation stricte (ex: `v1.0.0-lora-cybercode`) avec fichier `CHANGELOG.md` dédié aux poids et hyperparamètres d'entraînement.
+- **Versioning Sémantique (SemVer)** : Appliquer une numérotation stricte (ex: `v1.0.0-lora-cybersocle`) avec fichier `CHANGELOG.md` dédié aux poids et hyperparamètres d'entraînement.
 
 ---
 

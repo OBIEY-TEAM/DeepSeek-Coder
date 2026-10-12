@@ -1,7 +1,7 @@
-# Model Card - CyberCode Studio DeepSeek-Coder V1
+# Model Card - CYBERSOCLE DeepSeek-Coder V1
 
 ## Model Overview
-- **Model Name**: CyberCode Studio DeepSeek-Coder V1
+- **Model Name**: CYBERSOCLE DeepSeek-Coder V1
 - **Base Architecture**: DeepSeek-Coder V1 (1.3B, 6.7B, 33B parameters)
 - **Primary Languages**: Python, C/C++, Java, JavaScript, TypeScript, Go, Rust, SQL, HTML/CSS, Shell, etc.
 - **Specialization**: Sovereign AI code completion, FIM (Fill-In-the-Middle) fill, automated code review, OWASP Top 10 security auditing.

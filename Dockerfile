@@ -1,4 +1,4 @@
-# Dockerfile for CyberCode Studio - DeepSeek-Coder V1 Platform
+# Dockerfile for CYBERSOCLE - DeepSeek-Coder V1 Platform
 FROM nvidia/cuda:12.1.1-devel-ubuntu22.04
 
 ENV DEBIAN_FRONTEND=noninteractive

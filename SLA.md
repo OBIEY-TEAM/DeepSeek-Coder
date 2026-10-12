@@ -1,7 +1,7 @@
 # Service Level Agreement (SLA)
 
 ## Service Availability Commitment
-CyberCode Studio commits to a **99.9% uptime** for production API endpoints (`https://api.cybercode.studio`).
+CYBERSOCLE commits to a **99.9% uptime** for production API endpoints (`https://api.cybersocle.studio`).
 
 ## Service Credits & Support Response
 - **Critical (Outage)**: Response within 1 hour.

@@ -187,7 +187,7 @@ Propose l'interface en ligne de commande principale pour déployer la pile globa
 
 1. **Cloner le Dépôt & Installer le Package Python** :
    ```bash
-   git clone https://github.com/CyberCode-Studio/deepseek-coder-cybercode.git /app
+   git clone https://github.com/CYBERSOCLE/deepseek-coder-cybersocle.git /app
    cd /app
    pip install -e .
    ```

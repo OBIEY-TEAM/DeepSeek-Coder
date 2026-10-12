@@ -5,13 +5,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: cybercode-api
+    container_name: cybersocle-api
     command: python3 -m serve.api_server
     ports:
       - "8000:8000"
     environment:
       - MODEL_NAME=deepseek-ai/deepseek-coder-6.7b-instruct
-      - CYBERCODE_API_KEY=cybercode-secret-key-2025
+      - CYBERSOCLE_API_KEY=cybersocle-secret-key-2025
       - RATE_LIMIT_PER_MINUTE=100
     deploy:
       resources:
@@ -31,7 +31,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: cybercode-demo
+    container_name: cybersocle-demo
     command: python3 demo/app.py
     ports:
       - "7860:7860"
@@ -52,20 +52,20 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: cybercode-security-audit
+    container_name: cybersocle-security-audit
     command: python3 -c "import serve.security_audit; print('Security Audit Service Ready')"
     environment:
-      - CYBERCODE_API_KEY=cybercode-secret-key-2025
+      - CYBERSOCLE_API_KEY=cybersocle-secret-key-2025
     restart: always
 
   finetune:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: cybercode-finetune
+    container_name: cybersocle-finetune
     profiles:
       - training
-    command: python3 finetune/finetune_cybercode.py --data_path ./data/sample_dataset.json --output_dir ./models/cybercode-lora
+    command: python3 finetune/finetune_cybersocle.py --data_path ./data/sample_dataset.json --output_dir ./models/cybersocle-lora
     deploy:
       resources:
         reservations:

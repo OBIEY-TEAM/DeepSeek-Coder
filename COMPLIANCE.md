@@ -1,9 +1,9 @@
-# Compliance & Governance Standard - CyberCode Studio
+# Compliance & Governance Standard - CYBERSOCLE
 
 ## Regulatory Compliance Matrix
 
 ### 1. GDPR (General Data Protection Regulation)
-- Data minimization and strict anonymization filters (`finetune/finetune_cybercode.py`).
+- Data minimization and strict anonymization filters (`finetune/finetune_cybersocle.py`).
 - Right to be forgotten supported for custom fine-tuning datasets.
 
 ### 2. ISO/IEC 27001 & SOC 2 Type II Alignment

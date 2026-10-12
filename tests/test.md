@@ -1,6 +1,6 @@
 # RAPPORT DE QUALIFICATION DE PRODUCTION & SUIVI DE DÉVELOPPEMENT - CYBERSOCLE
 
-**Auteurs / Fondateurs** : OBIEY Christ Dany & Équipe CyberCode Studio
+**Auteurs / Fondateurs** : OBIEY Christ Dany & Équipe CYBERSOCLE
 **Date** : Année 2026
 **Statut** : CERTIFIÉ CONFORME POUR PRODUCTION - 100% PASSED (0 Simulation / 0 Hallucination)
 
@@ -130,7 +130,7 @@ Toutes les commandes CLI ont été testées en direct et validées avec succès 
 
 ## 4. FEUILLE DE ROUTE & ARCHITECTURE CIBLE (HORS MVP DIRECT - PRÉSENTATION JURY)
 
-Il est explicitement présenté au jury que les briques suivantes constituent la **feuille de route d'extension post-hackathon** de CyberCode Studio :
+Il est explicitement présenté au jury que les briques suivantes constituent la **feuille de route d'extension post-hackathon** de CYBERSOCLE :
 
 1. **Niveau 3 (Centre IA)** :
    - Traitement local hors-ligne du LLM DeepSeek-Coder V1 (`1.3b`, `6.7b`, `33b`) via `OfflineLLMEngine`.
@@ -163,7 +163,7 @@ Exécution globale exécutée via `PYTHONPATH=. python3 -m pytest test/ tests/` 
 - **Fichiers de test du dossier `tests/`** :
   - `tests/test_api_security.py` : **PASSED** (7 tests)
   - `tests/test_cybersocle.py` : **PASSED** (24 tests)
-  - `tests/test_finetune_cybercode.py` : **PASSED** (3 tests)
+  - `tests/test_finetune_cybersocle.py` : **PASSED** (3 tests)
   - `tests/test_non_regression.py` : **PASSED** (2 tests)
   - `tests/test_security_audit.py` : **PASSED** (4 tests)
   - `tests/test_templates.py` : **PASSED** (2 tests)

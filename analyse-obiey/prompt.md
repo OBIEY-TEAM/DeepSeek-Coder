@@ -1,6 +1,6 @@
-# Master Prompt d'Implémentation Globale - CyberCode Studio
+# Master Prompt d'Implémentation Globale - CYBERSOCLE
 
-> **Instructif** : Ce prompt est le guide maître pour tout développeur ou agent IA chargé d'exécuter la feuille de route d'amélioration de CyberCode Studio en s'appuyant sur les fichiers `analyse-obiey/analyse.md` et `analyse-obiey/amelioration.md`.
+> **Instructif** : Ce prompt est le guide maître pour tout développeur ou agent IA chargé d'exécuter la feuille de route d'amélioration de CYBERSOCLE en s'appuyant sur les fichiers `analyse-obiey/analyse.md` et `analyse-obiey/amelioration.md`.
 
 ---
 
@@ -16,7 +16,7 @@ Tu es un Ingénieur Expert en Cybersécurité, MLOps et Architecte Backend FastA
 
 ---
 
-### Objectif : Implémenter l'Ensemble des 9 Axes d'Amélioration de CyberCode Studio
+### Objectif : Implémenter l'Ensemble des 9 Axes d'Amélioration de CYBERSOCLE
 
 Réalise l'implémentation progressive et modulaire des améliorations suivantes :
 
@@ -45,7 +45,7 @@ Réalise l'implémentation progressive et modulaire des améliorations suivantes
 - Limiter la taille maximale des payloads d'audit à 5 Mo (413 Payload Too Large).
 
 #### 7. Versioning LoRA & MLflow Registry
-- Dans `finetune/finetune_cybercode.py`, ajouter le logging optionnel des hyperparamètres et métriques de loss via MLflow ou Weights & Biases.
+- Dans `finetune/finetune_cybersocle.py`, ajouter le logging optionnel des hyperparamètres et métriques de loss via MLflow ou Weights & Biases.
 
 #### 8. Scalabilité Multi-GPU & Conteneurisation
 - Mettre à jour le `Dockerfile` pour s'exécuter en tant qu'utilisateur non-root (`USER 10001`).
