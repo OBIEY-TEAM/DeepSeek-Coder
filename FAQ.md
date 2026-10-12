@@ -1,7 +1,7 @@
 # Frequently Asked Questions (FAQ)
 
-### Q1: What model family does CyberCode Studio use?
-CyberCode Studio strictly utilizes **DeepSeek-Coder V1** (1.3B, 6.7B, and 33B parameters). No V2, V3, or R1 models are used.
+### Q1: What model family does CYBERSOCLE use?
+CYBERSOCLE strictly utilizes **DeepSeek-Coder V1** (1.3B, 6.7B, and 33B parameters). No V2, V3, or R1 models are used.
 
 ### Q2: How do I run the API server locally?
 You can launch the server using Docker Compose:

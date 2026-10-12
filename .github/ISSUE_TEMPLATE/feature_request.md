@@ -4,7 +4,7 @@
 A clear and concise description of the requested feature.
 
 ## Motivation & Use Case
-Why is this feature needed? How does it benefit CyberCode Studio?
+Why is this feature needed? How does it benefit CYBERSOCLE?
 
 ## Proposed Solution
 Describe the implementation approach or architecture adjustments while ensuring backward compatibility with DeepSeek-Coder V1.

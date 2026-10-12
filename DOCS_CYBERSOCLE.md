@@ -1,4 +1,4 @@
-# GUIDES D'UTILISATION ET ARCHITECTURE CYBERCODE STUDIO
+# GUIDES D'UTILISATION ET ARCHITECTURE CYBERSOCLE STUDIO
 
 ## 1. MIGRATION ET COMPATIBILITÉ DEEPSEEK-CODER V1
 
@@ -16,16 +16,16 @@ Cette version personnalisée conserve l'intégralité des fonctionnalités basel
   python finetune/finetune_deepseekcoder.py \
     --model_name_or_path deepseek-ai/deepseek-coder-6.7b-instruct \
     --data_path ./data/dataset.json \
-    --output_dir ./models/cybercode-lora \
+    --output_dir ./models/cybersocle-lora \
     --use_peft --load_in_4bit --lora_r 16 --lora_alpha 32
   ```
-- Anonymisation et Fine-tuning Continu : `finetune/finetune_cybercode.py`
+- Anonymisation et Fine-tuning Continu : `finetune/finetune_cybersocle.py`
   - Supprime automatiquement les adresses IP, jetons Bearer, clés API et e-mails des données clients avant l'entraînement.
 - Fusion des adaptateurs LoRA : `finetune/merge_peft_adapters.py`
   ```bash
   python finetune/merge_peft_adapters.py \
     --base_model_path deepseek-ai/deepseek-coder-6.7b-instruct \
-    --adapter_path ./models/cybercode-lora \
+    --adapter_path ./models/cybersocle-lora \
     --output_dir ./models/merged-model
   ```
 
@@ -34,7 +34,7 @@ Cette version personnalisée conserve l'intégralité des fonctionnalités basel
   - `POST /v1/chat/completions`
   - `POST /v1/completions` (support FIM avec `<｜fim begin｜>`, `<｜fim hole｜>`, `<｜fim end｜>`)
   - `GET /v1/models`
-- Endpoints CyberCode Studio :
+- Endpoints CYBERSOCLE :
   - `POST /v1/security/audit` : Audit de sécurité du code.
   - `POST /v1/code/review` : Revue automatisée de PR.
   - `POST /v1/code/generate` : Génération de code sécurisé respectant OWASP Top 10.

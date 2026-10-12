@@ -1,6 +1,6 @@
 # RAPPORT DE QUALIFICATION PRODUCTION & CAHIER DE RECETTE TECHNIQUE CYBERSOCLE (TEST2.MD)
 
-**Projet** : CyberCode Studio / CYBERSOCLE
+**Projet** : CYBERSOCLE / CYBERSOCLE
 **Auteur / Lead Architecte** : OBIEY Christ Dany / Jules (Ingénieur IA & Cyber-Infrastructures)
 **Date de Qualification** : 2025
 **Environnement cible** : VPS LAB Central Systalink & Clusters Entreprises Clients
@@ -83,7 +83,7 @@ test/test_roadmap_architecture.py ...                                    [ 44%]
 test/test_structure_and_cli.py ......                                    [ 52%]
 tests/test_api_security.py .......                                       [ 61%]
 tests/test_cybersocle.py ........................                        [ 93%]
-tests/test_finetune_cybercode.py ...                                     [ 97%]
+tests/test_finetune_cybersocle.py ...                                     [ 97%]
 tests/test_non_regression.py ..                                          [ 98%]
 tests/test_security_audit.py ....                                        [100%]
 

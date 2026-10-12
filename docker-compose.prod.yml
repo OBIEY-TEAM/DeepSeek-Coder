@@ -5,15 +5,15 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: cybercode-studio/api-server:latest
-    container_name: cybercode-api-prod
+    image: cybersocle/api-server:latest
+    container_name: cybersocle-api-prod
     restart: always
     ports:
       - "8000:8000"
     environment:
       - HOST=0.0.0.0
       - PORT=8000
-      - API_KEY=${API_KEY:-cybercode-secret-key-change-in-production}
+      - API_KEY=${API_KEY:-cybersocle-secret-key-change-in-production}
       - ENVIRONMENT=production
     volumes:
       - model_cache:/root/.cache/huggingface
@@ -43,7 +43,7 @@ services:
       context: .
       dockerfile: Dockerfile
     command: python3 demo/app.py
-    container_name: cybercode-demo-prod
+    container_name: cybersocle-demo-prod
     restart: always
     ports:
       - "7860:7860"

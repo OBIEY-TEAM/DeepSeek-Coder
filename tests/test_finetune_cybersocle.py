@@ -3,13 +3,13 @@ import os
 import tempfile
 import unittest
 
-from finetune.finetune_cybercode import (
+from finetune.finetune_cybersocle import (
     anonymize_code_and_text,
     clean_and_anonymize_dataset,
 )
 
 
-class TestFinetuneCyberCode(unittest.TestCase):
+class TestFinetuneCYBERSOCLE(unittest.TestCase):
     """
     Test suite for data anonymization and fine-tuning dataset preprocessing.
     """

@@ -126,7 +126,7 @@ print(tokenizer.decode(outputs[0][len(inputs[0]):], skip_special_tokens=True))
 
 ### 5. How to Fine-tune DeepSeek-Coder (Full / LoRA / QLoRA)
 
-We provide `finetune/finetune_deepseekcoder.py` and `finetune/finetune_cybercode.py` for finetuning our models on downstream tasks.
+We provide `finetune/finetune_deepseekcoder.py` and `finetune/finetune_cybersocle.py` for finetuning our models on downstream tasks.
 
 ```bash
 pip install -r finetune/requirements.txt
@@ -137,15 +137,15 @@ pip install -r finetune/requirements.txt
 python finetune/finetune_deepseekcoder.py \
     --model_name_or_path deepseek-ai/deepseek-coder-6.7b-instruct \
     --data_path ./data/dataset.json \
-    --output_dir ./models/cybercode-lora \
+    --output_dir ./models/cybersocle-lora \
     --use_peft --load_in_4bit --lora_r 16 --lora_alpha 32
 ```
 
 #### Continuous Fine-Tuning with Anonymization
 ```bash
-python finetune/finetune_cybercode.py \
+python finetune/finetune_cybersocle.py \
     --data_path ./data/raw_data.json \
-    --output_dir ./models/cybercode-lora
+    --output_dir ./models/cybersocle-lora
 ```
 
 ---
@@ -163,7 +163,7 @@ python -m serve.api_server
 docker compose up --build -d
 ```
 
-For complete documentation, security incident procedures, and cost analyses, see `DOCS_CYBERCODE.md` and `INCIDENT_RESPONSE.md`.
+For complete documentation, security incident procedures, and cost analyses, see `DOCS_CYBERSOCLE.md` and `INCIDENT_RESPONSE.md`.
 
 ---
 

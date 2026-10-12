@@ -58,7 +58,7 @@ def clean_and_anonymize_dataset(raw_dataset_path: str, output_cleaned_path: str)
     return output_cleaned_path
 
 def main():
-    parser = argparse.ArgumentParser(description="CyberCode Studio Fine-Tuning Pipeline with Data Anonymization.")
+    parser = argparse.ArgumentParser(description="CYBERSOCLE Fine-Tuning Pipeline with Data Anonymization.")
     parser.add_argument("--model_name_or_path", type=str, default=DEFAULT_MODEL_NAME)
     parser.add_argument("--data_path", type=str, required=True, help="Path to input raw training JSON dataset.")
     parser.add_argument("--output_dir", type=str, required=True, help="Output directory for model/LoRA adapter.")
@@ -76,10 +76,10 @@ def main():
     if "v2" in args.model_name_or_path.lower() or "v3" in args.model_name_or_path.lower() or "r1" in args.model_name_or_path.lower():
         raise ValueError("Usage of DeepSeek V2, V3 or R1 models is strictly prohibited. Only V1 models are allowed.")
 
-    cleaned_data_path = os.path.join(args.output_dir, "cleaned_cybercode_dataset.json")
+    cleaned_data_path = os.path.join(args.output_dir, "cleaned_cybersocle_dataset.json")
     clean_and_anonymize_dataset(args.data_path, cleaned_data_path)
 
-    print(f"Starting CyberCode Studio fine-tuning with model {args.model_name_or_path}...")
+    print(f"Starting CYBERSOCLE fine-tuning with model {args.model_name_or_path}...")
 
     # Build Training Command / Execution logic using transformers Trainer
     cmd = (

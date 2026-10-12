@@ -1,6 +1,6 @@
-# PLAN DE RÉPONSE AUX INCIDENTS - CYBERCODE STUDIO
+# PLAN DE RÉPONSE AUX INCIDENTS - CYBERSOCLE STUDIO
 
-Ce document définit les procédures d'urgence (*Incident Response*) pour l'infrastructure DeepSeek-Coder V1 de CyberCode Studio.
+Ce document définit les procédures d'urgence (*Incident Response*) pour l'infrastructure DeepSeek-Coder V1 de CYBERSOCLE.
 
 ---
 
@@ -11,7 +11,7 @@ Ce document définit les procédures d'urgence (*Incident Response*) pour l'infr
 ### Procédure d'Urgence :
 1. **Révocation immédiate des secrets** :
    - Invalider la clé API compromise via HashiCorp Vault ou AWS Secrets Manager.
-   - Mettre à jour la variable `CYBERCODE_API_KEY` sur le serveur de production.
+   - Mettre à jour la variable `CYBERSOCLE_API_KEY` sur le serveur de production.
 2. **Rotation des jetons** :
    - Générer une nouvelle clé API et redistribuer aux services autorisés via canal sécurisé.
 3. **Purge et Isolation** :

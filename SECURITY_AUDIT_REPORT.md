@@ -1,7 +1,7 @@
 # Security Audit Report - Executive Summary
 
 ## Overview
-An automated static and dynamic security audit was conducted on CyberCode Studio DeepSeek-Coder V1 services and codebase.
+An automated static and dynamic security audit was conducted on CYBERSOCLE DeepSeek-Coder V1 services and codebase.
 
 ## Findings Summary
 - **Critical Vulnerabilities**: 0

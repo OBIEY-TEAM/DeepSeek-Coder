@@ -39,7 +39,7 @@ def start_vllm_server(
     vllm_api_main()
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="vLLM OpenAI API Server for CyberCode Studio")
+    parser = argparse.ArgumentParser(description="vLLM OpenAI API Server for CYBERSOCLE")
     parser.add_argument("--model", type=str, default=DEFAULT_MODEL, help="Model path or HF ID")
     parser.add_argument("--host", type=str, default="0.0.0.0")
     parser.add_argument("--port", type=int, default=8000)

@@ -1,4 +1,4 @@
-name: CI/CD Pipeline - CyberCode Studio DeepSeek-Coder V1
+name: CI/CD Pipeline - CYBERSOCLE DeepSeek-Coder V1
 
 on:
   push:

@@ -2,8 +2,8 @@ import re
 
 from pydantic import BaseModel, Field
 
-CYBERCODE_SECURITY_SYSTEM_PROMPT = """\
-Tu es un expert en cybersécurité chez CyberCode Studio. Analyse le code suivant et identifie les vulnérabilités potentielles. Pour chaque faille, indique la ligne, le type, la gravité (faible/moyenne/élevée/critique) et propose un correctif précis.
+CYBERSOCLE_SECURITY_SYSTEM_PROMPT = """\
+Tu es un expert en cybersécurité chez CYBERSOCLE. Analyse le code suivant et identifie les vulnérabilités potentielles. Pour chaque faille, indique la ligne, le type, la gravité (faible/moyenne/élevée/critique) et propose un correctif précis.
 Code : {code}
 Langage : {langage}
 """
@@ -67,9 +67,9 @@ class SecurityAuditor:
 
     def build_audit_prompt(self, code: str, language: str = "auto") -> str:
         """
-        Builds the exact system prompt instructed for CyberCode Studio audit.
+        Builds the exact system prompt instructed for CYBERSOCLE audit.
         """
-        return CYBERCODE_SECURITY_SYSTEM_PROMPT.format(code=code, langage=language)
+        return CYBERSOCLE_SECURITY_SYSTEM_PROMPT.format(code=code, langage=language)
 
     def analyze(self, code: str, language: str = "auto") -> SecurityAuditReport:
         """

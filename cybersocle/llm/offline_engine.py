@@ -58,7 +58,7 @@ class HotStandbyLLMManager:
 class OfflineLLMEngine:
     def __init__(
         self,
-        model_path: str = "./models/cybercode-6.7b-q4.gguf",
+        model_path: str = "./models/cybersocle-6.7b-q4.gguf",
         quantization: str = "Q4_K_M",
         profile: str = "FULL_CLUSTER"
     ):
