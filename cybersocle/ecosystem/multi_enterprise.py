@@ -1,5 +1,6 @@
 """
 Multi-Enterprise Ecosystem & CYBERSOCLE LAB Bridge (OBIEY Christ Dany).
+Supports Zero-Knowledge Proof anonymization and Cloud Souverain Systalink distribution.
 """
 
 from typing import Any
@@ -10,7 +11,7 @@ class ZeroKnowledgeProofAnonymizer:
     @staticmethod
     def anonymize_cartography(cartography: dict[str, Any]) -> dict[str, Any]:
         """
-        Applies explicit cybercard anonymization for VPS LAB sharing (Point 8) + ZKP proofs.
+        Applies explicit cybercard anonymization for VPS LAB sharing + ZKP proofs.
         """
         gen = STIXCybercardGenerator()
         anon_cartography = gen.anonymize_cybercard_for_vps_lab(cartography)
@@ -19,8 +20,13 @@ class ZeroKnowledgeProofAnonymizer:
 
 
 class MultiEnterpriseLabBridge:
-    def __init__(self, lab_vpn_ip: str = "10.100.0.1"):
+    def __init__(
+        self,
+        lab_vpn_ip: str = "10.100.0.1",
+        lab_vps_endpoint: str = "https://lab.systalink-cloud.fr/v1/vaccines"
+    ):
         self.lab_vpn_ip = lab_vpn_ip
+        self.lab_vps_endpoint = lab_vps_endpoint
         self.zkp_anonymizer = ZeroKnowledgeProofAnonymizer()
         self.shared_vaccine_repository: dict[str, dict[str, Any]] = {}
 
@@ -34,7 +40,8 @@ class MultiEnterpriseLabBridge:
             "lab_retested": True,
             "lab_human_validated": True,
             "approved_by_lab_founders": "OBIEY Christ Dany",
-            "available_for_distribution": True
+            "available_for_distribution": True,
+            "cloud_souverain_endpoint": self.lab_vps_endpoint
         }
 
         return {
@@ -42,5 +49,6 @@ class MultiEnterpriseLabBridge:
             "vaccine_id": vaccine_id,
             "zkp_anonymized": True,
             "lab_retested": True,
-            "broadcast_ready": True
+            "broadcast_ready": True,
+            "target_endpoint": self.lab_vps_endpoint
         }
