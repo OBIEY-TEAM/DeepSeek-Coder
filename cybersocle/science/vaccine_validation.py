@@ -1,9 +1,10 @@
 """
-Formal Vaccine Validation & Test Engine for Bateau TEST.
+Formal Vaccine Validation & Test Engine for Bateau TEST (Level 5).
 """
 
 import ast
 from typing import Any
+from cybersocle.science.qualifier import VaccineASTChecker, FormalVaccineQualifier
 
 
 class FormalVaccineValidator:
@@ -37,8 +38,10 @@ class FormalVaccineValidator:
         code = vaccine_pkg.get("code_patch", "")
 
         try:
-            ast.parse(code)
-            ast_valid = True
+            parsed = ast.parse(code)
+            checker = VaccineASTChecker()
+            checker.visit(parsed)
+            ast_valid = len(checker.violations) == 0
         except SyntaxError as e:
             return {
                 "passed": False,
@@ -49,7 +52,9 @@ class FormalVaccineValidator:
                 "status": "REJECTED"
             }
 
-        bandit_passed = "eval(" not in code and "exec(" not in code and "os.system(" not in code
+        forbidden_patterns = ["eval(", "exec(", "os.system(", "subprocess", "os.popen"]
+        bandit_scan_res = FormalVaccineQualifier.run_bandit_scan(code)
+        bandit_passed = bandit_scan_res["passed"] and not any(p in code for p in forbidden_patterns)
 
         performance_impact = {
             "cpu_overhead_percent": vaccine_pkg.get("cpu_overhead", 0.2),

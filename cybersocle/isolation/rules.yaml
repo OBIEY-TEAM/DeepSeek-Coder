@@ -1,0 +1,45 @@
+# CYBERSOCLE eBPF Falco Isolation Rules (Level 2 Quarantine)
+# Monitors container isolation, prevents downward bridges to Level 1 production,
+# and catches reverse shells / privilege escalation.
+
+- list: dangerous_binaries
+  items: [bash, sh, zsh, dash, nc, ncat, netcat, socat]
+
+- rule: CyberSocle Reverse Shell Execution
+  desc: Detects execution of shell or reverse shell tools inside immutable cells
+  condition: >
+    evt.type = execve and proc.name in (dangerous_binaries)
+    and container.id != host
+  output: "CRITICAL: Reverse shell attempt inside cell (user=%user.name process=%proc.name cmd=%proc.cmdline container=%container.id)"
+  priority: CRITICAL
+  tags: [ebpf, quarantine, isolation, reverse_shell]
+
+- rule: CyberSocle Downward Bridge Network Attempt
+  desc: Detects any unauthorized network bridge or connection from Level 2 Quarantine to Level 1 Production
+  condition: >
+    evt.type in (connect, accept, sendto) and
+    fd.net != "" and
+    fd.sip != "127.0.0.1" and
+    container.name contains "prison" and
+    fd.rip contains "172.28.0."
+  output: "HIGH: Downward network bridge attempt from Level 2 Quarantine to Level 1 Prod (proc=%proc.name target_ip=%fd.rip)"
+  priority: HIGH
+  tags: [ebpf, microsegmentation, level1_protection]
+
+- rule: CyberSocle Ptrace Injection Attempt
+  desc: Detects ptrace or memory manipulation inside quarantined cells
+  condition: >
+    evt.type = ptrace and
+    container.id != host
+  output: "HIGH: Memory injection or ptrace syscall inside cell (proc=%proc.name user=%user.name)"
+  priority: HIGH
+  tags: [ebpf, isolation, ptrace]
+
+- rule: CyberSocle Canary Token File Access
+  desc: Detects access to canary files planted in honeypot containers
+  condition: >
+    evt.type in (open, openat) and
+    fd.name contains "canary"
+  output: "CRITICAL: Canary token triggered in honeypot (user=%user.name file=%fd.name process=%proc.name)"
+  priority: CRITICAL
+  tags: [canary_token, honeypot, telemetry]
