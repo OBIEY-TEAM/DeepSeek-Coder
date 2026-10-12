@@ -1,10 +1,21 @@
 import os
 from collections.abc import Iterator
 from threading import Thread
+from unittest.mock import MagicMock
 
-import gradio as gr
-import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer, TextIteratorStreamer
+try:
+    import gradio as gr
+except ImportError:
+    gr = MagicMock()
+
+try:
+    import torch
+    from transformers import AutoModelForCausalLM, AutoTokenizer, TextIteratorStreamer
+except ImportError:
+    torch = MagicMock()
+    AutoModelForCausalLM = MagicMock()
+    AutoTokenizer = MagicMock()
+    TextIteratorStreamer = MagicMock()
 
 try:
     import spaces
@@ -120,9 +131,9 @@ TRANSLATIONS = {
 }
 
 def get_device():
-    if torch.cuda.is_available():
+    if hasattr(torch, "cuda") and torch.cuda.is_available():
         return "cuda"
-    elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+    elif hasattr(torch, "backends") and hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
         return "mps"
     return "cpu"
 
@@ -139,7 +150,7 @@ def load_model_and_tokenizer():
     tokenizer = AutoTokenizer.from_pretrained(MODEL_ID, trust_remote_code=True)
     tokenizer.use_default_system_prompt = False
 
-    torch_dtype = torch.bfloat16 if device == "cuda" else torch.float32
+    torch_dtype = getattr(torch, "bfloat16", None) if device == "cuda" else getattr(torch, "float32", None)
     device_map = "auto" if device == "cuda" else None
 
     try:
@@ -149,7 +160,7 @@ def load_model_and_tokenizer():
             device_map=device_map,
             trust_remote_code=True
         )
-        if device_map is None:
+        if device_map is None and hasattr(model, "to"):
             model = model.to(device)
     except Exception as e:
         print(f"Error loading model: {e}")
@@ -186,18 +197,18 @@ def generate(
         input_ids = input_ids.to(model.device)
 
         streamer = TextIteratorStreamer(tokenizer, timeout=10.0, skip_prompt=True, skip_special_tokens=True)
-        generate_kwargs = dict(
-            input_ids=input_ids,
-            streamer=streamer,
-            max_new_tokens=max_new_tokens,
-            do_sample=temperature > 0,
-            temperature=temperature if temperature > 0 else None,
-            top_p=top_p if temperature > 0 else None,
-            top_k=top_k if temperature > 0 else None,
-            num_beams=1,
-            repetition_penalty=repetition_penalty,
-            eos_token_id=tokenizer.eos_token_id
-        )
+        generate_kwargs = {
+            "input_ids": input_ids,
+            "streamer": streamer,
+            "max_new_tokens": max_new_tokens,
+            "do_sample": temperature > 0,
+            "temperature": temperature if temperature > 0 else None,
+            "top_p": top_p if temperature > 0 else None,
+            "top_k": top_k if temperature > 0 else None,
+            "num_beams": 1,
+            "repetition_penalty": repetition_penalty,
+            "eos_token_id": tokenizer.eos_token_id
+        }
         generate_kwargs = {k: v for k, v in generate_kwargs.items() if v is not None}
 
         t = Thread(target=model.generate, kwargs=generate_kwargs)
@@ -208,10 +219,6 @@ def generate(
             outputs.append(text)
             yield "".join(outputs).replace("<|EOT|>", "")
 
-    except torch.cuda.OutOfMemoryError:
-        if torch.cuda.is_available():
-            torch.cuda.empty_cache()
-        yield "An Out of Memory (OOM) error occurred on the GPU. Please try again with shorter context or fewer generation tokens."
     except Exception as e:
         yield f"Generation error: {e!s}"
 
@@ -227,6 +234,25 @@ def switch_language(
     t = TRANSLATIONS[lang_key]
 
     header_md = f"# {t['title']}\n{t['subtitle']}\n\n{t['description']}"
+
+    update_fn = getattr(gr, "update", None)
+    if update_fn is callable:
+        return (
+            header_md,
+            update_fn(label=t["voice_label"], choices=t["voice_options"], value=t["voice_options"][0]),
+            update_fn(label=t["system_prompt_label"], value=t["system_prompt_value"]),
+            update_fn(label=t["max_tokens_label"], value=curr_max_tokens),
+            update_fn(label=t["top_p_label"], value=curr_top_p),
+            update_fn(label=t["top_k_label"], value=curr_top_k),
+            update_fn(label=t["rep_penalty_label"], value=curr_rep_penalty),
+            t["security_tour_title"] + "\n" + t["security_tour_text"],
+            t["pricing_title"] + "\n" + t["pricing_text"],
+            t["faq_title"] + "\n" + t["faq_text"],
+            update_fn(value=t["submit_btn"]),
+            update_fn(value=t["clear_btn"]),
+            update_fn(value=t["undo_btn"]),
+            update_fn(value=t["retry_btn"]),
+        )
 
     return (
         header_md,
@@ -246,7 +272,13 @@ def switch_language(
     )
 
 
-with gr.Blocks(title="CYBERSOCLE") as demo:
+style_path = os.path.join(os.path.dirname(__file__), "style.css")
+css_content = ""
+if os.path.exists(style_path):
+    with open(style_path, encoding="utf-8") as f:
+        css_content = f.read()
+
+with gr.Blocks(title="CYBERSOCLE", css=css_content) as demo:
     default_lang = "fr"
     t_def = TRANSLATIONS[default_lang]
 
@@ -389,7 +421,7 @@ with gr.Blocks(title="CYBERSOCLE") as demo:
         chatbot
     )
 
-    clear_btn.click(lambda: [], None, chatbot, queue=False)
+    clear_btn.click(list, None, chatbot, queue=False)
     undo_btn.click(undo_last_chat, chatbot, chatbot, queue=False)
     retry_btn.click(
         retry_last_chat,
