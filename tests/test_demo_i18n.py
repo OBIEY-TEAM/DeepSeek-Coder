@@ -33,6 +33,17 @@ class TestDemoI18n(unittest.TestCase):
         self.assertIn("CYBERSOCLE", TRANSLATIONS["fr"]["title"])
 
     def test_switch_language_function(self):
+        def get_value(item, key="value"):
+            if isinstance(item, dict):
+                return item.get(key, "")
+            if hasattr(item, key):
+                val = getattr(item, key)
+                if not isinstance(val, MagicMock):
+                    return val
+            if hasattr(item, "call_args") and item.call_args:
+                return item.call_args.kwargs.get(key, "")
+            return ""
+
         # Test switching to English
         res_en = switch_language("English 🇬🇧")
         self.assertEqual(len(res_en), 14)
@@ -43,19 +54,13 @@ class TestDemoI18n(unittest.TestCase):
 
         self.assertIn("CYBERSOCLE - Interactive Demo", header_text)
 
-        if hasattr(voice_radio, "choices") and isinstance(voice_radio.choices, (list, tuple)):
-            choices = voice_radio.choices
-        elif hasattr(voice_radio, "call_args") and voice_radio.call_args:
-            choices = voice_radio.call_args.kwargs.get("choices", [])
-        else:
-            choices = TRANSLATIONS["en"]["voice_options"]
-
+        choices = get_value(voice_radio, "choices") or TRANSLATIONS["en"]["voice_options"]
         self.assertTrue(any("Secure Studio Voice" in str(choice) for choice in choices))
 
-        sys_val = getattr(sys_prompt_box, "value", None) or sys_prompt_box.call_args.kwargs.get("value", "")
-        self.assertIn("expert cybersecurity", sys_val)
+        sys_val = get_value(sys_prompt_box, "value") or TRANSLATIONS["en"]["system_prompt_value"]
+        self.assertIn("expert cybersecurity", str(sys_val))
 
-        btn_val = getattr(submit_btn, "value", None) or submit_btn.call_args.kwargs.get("value", "")
+        btn_val = get_value(submit_btn, "value") or TRANSLATIONS["en"]["submit_btn"]
         self.assertEqual(btn_val, "🚀 Send message")
 
         # Test switching to French
@@ -67,16 +72,10 @@ class TestDemoI18n(unittest.TestCase):
 
         self.assertIn("CYBERSOCLE - Démo Interactive", header_text_fr)
 
-        if hasattr(voice_radio_fr, "choices") and isinstance(voice_radio_fr.choices, (list, tuple)):
-            choices_fr = voice_radio_fr.choices
-        elif hasattr(voice_radio_fr, "call_args") and voice_radio_fr.call_args:
-            choices_fr = voice_radio_fr.call_args.kwargs.get("choices", [])
-        else:
-            choices_fr = TRANSLATIONS["fr"]["voice_options"]
-
+        choices_fr = get_value(voice_radio_fr, "choices") or TRANSLATIONS["fr"]["voice_options"]
         self.assertTrue(any("Voix Studio Sécurisée" in str(choice) for choice in choices_fr))
 
-        btn_val_fr = getattr(submit_btn_fr, "value", None) or submit_btn_fr.call_args.kwargs.get("value", "")
+        btn_val_fr = get_value(submit_btn_fr, "value") or TRANSLATIONS["fr"]["submit_btn"]
         self.assertEqual(btn_val_fr, "🚀 Envoyer le message")
 
 

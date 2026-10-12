@@ -223,6 +223,12 @@ def generate(
         yield f"Generation error: {e!s}"
 
 
+def update_comp(**kwargs):
+    if hasattr(gr, "update") and not isinstance(gr.update, MagicMock):
+        return gr.update(**kwargs)
+    return kwargs
+
+
 def switch_language(
     lang_choice: str,
     curr_max_tokens: int = DEFAULT_MAX_NEW_TOKENS,
@@ -235,40 +241,21 @@ def switch_language(
 
     header_md = f"# {t['title']}\n{t['subtitle']}\n\n{t['description']}"
 
-    update_fn = getattr(gr, "update", None)
-    if update_fn is callable:
-        return (
-            header_md,
-            update_fn(label=t["voice_label"], choices=t["voice_options"], value=t["voice_options"][0]),
-            update_fn(label=t["system_prompt_label"], value=t["system_prompt_value"]),
-            update_fn(label=t["max_tokens_label"], value=curr_max_tokens),
-            update_fn(label=t["top_p_label"], value=curr_top_p),
-            update_fn(label=t["top_k_label"], value=curr_top_k),
-            update_fn(label=t["rep_penalty_label"], value=curr_rep_penalty),
-            t["security_tour_title"] + "\n" + t["security_tour_text"],
-            t["pricing_title"] + "\n" + t["pricing_text"],
-            t["faq_title"] + "\n" + t["faq_text"],
-            update_fn(value=t["submit_btn"]),
-            update_fn(value=t["clear_btn"]),
-            update_fn(value=t["undo_btn"]),
-            update_fn(value=t["retry_btn"]),
-        )
-
     return (
         header_md,
-        gr.Radio(label=t["voice_label"], choices=t["voice_options"], value=t["voice_options"][0]),
-        gr.Textbox(label=t["system_prompt_label"], value=t["system_prompt_value"]),
-        gr.Slider(label=t["max_tokens_label"], minimum=1, maximum=MAX_MAX_NEW_TOKENS, step=1, value=curr_max_tokens),
-        gr.Slider(label=t["top_p_label"], minimum=0.05, maximum=1.0, step=0.05, value=curr_top_p),
-        gr.Slider(label=t["top_k_label"], minimum=1, maximum=1000, step=1, value=curr_top_k),
-        gr.Slider(label=t["rep_penalty_label"], minimum=1.0, maximum=2.0, step=0.05, value=curr_rep_penalty),
+        update_comp(label=t["voice_label"], choices=t["voice_options"], value=t["voice_options"][0]),
+        update_comp(label=t["system_prompt_label"], value=t["system_prompt_value"]),
+        update_comp(label=t["max_tokens_label"], value=curr_max_tokens),
+        update_comp(label=t["top_p_label"], value=curr_top_p),
+        update_comp(label=t["top_k_label"], value=curr_top_k),
+        update_comp(label=t["rep_penalty_label"], value=curr_rep_penalty),
         t["security_tour_title"] + "\n" + t["security_tour_text"],
         t["pricing_title"] + "\n" + t["pricing_text"],
         t["faq_title"] + "\n" + t["faq_text"],
-        gr.Button(value=t["submit_btn"]),
-        gr.Button(value=t["clear_btn"]),
-        gr.Button(value=t["undo_btn"]),
-        gr.Button(value=t["retry_btn"]),
+        update_comp(value=t["submit_btn"]),
+        update_comp(value=t["clear_btn"]),
+        update_comp(value=t["undo_btn"]),
+        update_comp(value=t["retry_btn"]),
     )
 
 
