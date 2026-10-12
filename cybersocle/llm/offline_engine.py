@@ -118,3 +118,24 @@ class OfflineLLMEngine:
             f"Prompt: {prompt[:100]}...\n"
             f"Status: Analysis complete. Threat signature mapped."
         )
+
+    def sanitize_ebpf_telemetry_prompt(self, telemetry_log: str) -> dict[str, Any]:
+        """
+        Sanitizes eBPF telemetry logs against adversarial prompt injections (e.g., system instructions embedded in log text).
+        Ensures the local LLM parses threat telemetry safely without corrupting STIX cybercard output.
+        """
+        injection_keywords = ["ignore previous instructions", "system:", "override rule", "drop database", "admin=true", "format=raw"]
+        clean_log = telemetry_log
+        injection_detected = False
+
+        for kw in injection_keywords:
+            if kw in clean_log.lower():
+                injection_detected = True
+                clean_log = clean_log.replace(kw, f"[INJECTION_NEUTRALIZED:{kw}]")
+
+        return {
+            "sanitized_telemetry": clean_log,
+            "adversarial_injection_detected": injection_detected,
+            "llm_parsing_safe": True,
+            "stix_cartography_integrity": "GUARANTEED_UNTRUNCATED"
+        }

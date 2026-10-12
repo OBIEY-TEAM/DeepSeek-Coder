@@ -83,3 +83,24 @@ class TestNiveau6VPSZKP(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+    def test_6_4_wan_multi_tenant_load_and_zkp_saturation(self):
+        """
+        Test 6.4 — Charge WAN multi-sites & Saturation des canaux ZKP :
+        Simulation d'injections massives d'attaques multi-entreprises et mesure de la saturation ZKP.
+        """
+        wan_res = self.bridge.simulate_wan_multi_tenant_load(
+            enterprise_count=100,
+            requests_per_enterprise=100,
+            latency_ms_range=(20.0, 120.0),
+            packet_loss_percent=1.0
+        )
+        self.assertEqual(wan_res["status"], "WAN_LOAD_TEST_PASSED")
+        self.assertEqual(wan_res["enterprises_simulated"], 100)
+        self.assertEqual(wan_res["total_injected_requests"], 10000)
+        self.assertEqual(wan_res["vps_lab_status"], "STABLE_UNDER_WAN_LOAD")
+
+        zkp_sat = self.bridge.saturate_zkp_channel(cybercard_stream_count=500)
+        self.assertEqual(zkp_sat["status"], "ZKP_SATURATION_TEST_PASSED")
+        self.assertEqual(zkp_sat["successfully_anonymized"], 500)
+        self.assertEqual(zkp_sat["zkp_pipeline_status"], "NO_SATURATION_ZERO_LEAK")

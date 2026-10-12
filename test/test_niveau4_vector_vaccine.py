@@ -88,3 +88,15 @@ class TestNiveau4VectorVaccine(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+    def test_4_4_model_drift_detection_and_fallback(self):
+        """
+        Test 4.4 — Test de dérive du modèle (Model Drift) :
+        Confrontation du modèle à des schémas d'attaque totalement inédits non représentés dans Qdrant.
+        """
+        unknown_pattern = {"type": "QUANTUM_EXPLOIT_UNKNOWN_VECTOR", "payload": "0xDEADBEEF"}
+        drift_res = self.lab.detect_model_drift(unknown_pattern)
+        self.assertEqual(drift_res["status"], "MODEL_DRIFT_DETECTED")
+        self.assertTrue(drift_res["novel_attack_pattern"])
+        self.assertEqual(drift_res["fallback_mechanism"], "HEURISTIC_RULESET_FALLBACK")
+        self.assertEqual(drift_res["stix_cartography_integrity"], "PRESERVED_VIA_FALLBACK")
