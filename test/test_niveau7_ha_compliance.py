@@ -64,3 +64,24 @@ class TestNiveau7HACompliance(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+    def test_7_3_vps_lab_ddos_drp_and_gitops_reconciliation(self):
+        """
+        Test 7.3 — Disaster Recovery Plan (DRP) du VPS LAB & Réconciliation GitOps après coupure prolongée :
+        Vérification du mode dégradé local sous DDoS et resynchronisation GitOps sans conflit.
+        """
+        from cybersocle.ecosystem.gitops_manager import GitOpsPolicyManager
+        gitops = GitOpsPolicyManager()
+
+        # Test DDoS Degraded mode
+        ddos_res = gitops.handle_vps_lab_ddos_degraded_mode(ddos_active=True)
+        self.assertEqual(ddos_res["status"], "LOCAL_DEGRADED_AUTONOMOUS_MODE")
+        self.assertFalse(ddos_res["central_vps_lab_accessible"])
+        self.assertTrue(ddos_res["local_ebpf_enforcement"] == "ACTIVE_STANDALONE")
+
+        # Test GitOps reconciliation after prolonged outage
+        rec_res = gitops.reconcile_state_after_prolonged_outage(local_policy_version="v1.0.0", central_policy_version="v1.3.0")
+        self.assertEqual(rec_res["status"], "GITOPS_RECONCILIATION_COMPLETE")
+        self.assertEqual(rec_res["reconciliation_action"], "FAST_FORWARD_MERGE_3WAY_CLEAN")
+        self.assertEqual(rec_res["policy_conflicts_detected"], 0)
+        self.assertTrue(rec_res["security_state_unified"])

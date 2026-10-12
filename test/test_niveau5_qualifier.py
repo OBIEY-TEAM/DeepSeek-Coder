@@ -106,3 +106,32 @@ def filter_sql_params(query_param: str) -> str:
 
 if __name__ == "__main__":
     unittest.main()
+
+    def test_post_ast_semantic_validation_crowdstrike_prevention(self):
+        """
+        Validation sémantique et effets secondaires applicatifs (Incohérence de paramètres / CrowdStrike) :
+        Vérification qu'un vaccin valide en forme ne contient pas d'incohérence provoquant un crash mémoire noyau.
+        """
+        valid_pkg = {"code_patch": "def patch(): pass", "ebpf_rule": {"stack_size_bytes": 128}}
+        sem_res = self.validator.validate_semantic_side_effects(valid_pkg)
+        self.assertEqual(sem_res["status"], "SEMANTIC_VALIDATION_PASSED")
+        self.assertTrue(sem_res["semantic_check_passed"])
+        self.assertTrue(sem_res["crowdstrike_style_incident_prevented"])
+
+        # Test invalid memory parameter
+        bad_pkg = {"code_patch": "ptr = 0xFFFFFFFF", "ebpf_rule": {"stack_size_bytes": 1024}}
+        bad_sem = self.validator.validate_semantic_side_effects(bad_pkg)
+        self.assertEqual(bad_sem["status"], "SEMANTIC_INCONSISTENCY_REJECTED")
+        self.assertFalse(bad_sem["semantic_check_passed"])
+        self.assertTrue(bad_sem["crowdstrike_style_incident_prevented"])
+
+    def test_canary_deployment_progressive_clusters(self):
+        """
+        Tests A/B et déploiement progressif en grappes (Canary Deployment) :
+        Application du vaccin sur un échantillon restreint avant généralisation.
+        """
+        nodes = [f"srv-prod-{i:02d}" for i in range(1, 21)]
+        canary_res = self.validator.execute_canary_deployment("VACC-2026-001", nodes, canary_sample_percent=10.0)
+        self.assertEqual(canary_res["status"], "CANARY_PHASE_ACTIVE")
+        self.assertEqual(len(canary_res["canary_nodes"]), 2)
+        self.assertEqual(len(canary_res["remaining_nodes_queued"]), 18)

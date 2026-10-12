@@ -129,3 +129,25 @@ class TestNiveau2Quarantine(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+    def test_2_6_kernel_breakout_resilience(self):
+        """
+        Test 2.6 — Audit d'évasion par failles Zero-Day noyau :
+        Test d'intrusion eBPF / Cilium tentant d'exploiter une vulnérabilité du noyau Linux.
+        """
+        payload = "EXECUTE_0DAY_PTRACE_KERNEL_ESCAPE_EXPLOIT"
+        res = ContainerHardening.verify_kernel_breakout_resilience(payload)
+        self.assertEqual(res["status"], "BREAKOUT_BLOCKED")
+        self.assertTrue(res["container_escape_prevented"])
+        self.assertEqual(res["isolation_level"], "LEVEL_2_QUARANTINE_HERMETIC")
+
+    def test_2_7_side_channel_attack_isolation(self):
+        """
+        Test 2.7 — Attaques par canaux auxiliaires (Side-Channel) :
+        Vérification qu'un attaquant piégé au Niveau 2 ne peut pas déduire d'informations sur la production du Niveau 1.
+        """
+        manager = IncidentIsolationManager()
+        audit = manager.audit_side_channel_isolation()
+        self.assertEqual(audit["status"], "SIDE_CHANNEL_ISOLATION_VERIFIED")
+        self.assertFalse(audit["cross_tenant_inference_possible"])
+        self.assertEqual(audit["level1_officiel_data_leak"], "ZERO_LEAK_CONFIRMED")
