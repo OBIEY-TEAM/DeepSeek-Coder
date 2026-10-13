@@ -1,6 +1,6 @@
 import unittest
 
-from finetune.finetune_deepseekcoder import DEFAULT_MODEL_NAME
+from finetune.finetune_cybersocle import DEFAULT_MODEL_NAME
 
 
 class TestNonRegressionV1(unittest.TestCase):
