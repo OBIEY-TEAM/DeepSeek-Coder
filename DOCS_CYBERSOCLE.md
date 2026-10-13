@@ -1,26 +1,24 @@
 # GUIDES D'UTILISATION ET ARCHITECTURE CYBERSOCLE STUDIO
 
-## 1. MIGRATION ET COMPATIBILITÉ DEEPSEEK-CODER V1
+## 1. COMPATIBILITÉ DEEPSEEK-CODER V1
 
-Cette version personnalisée conserve l'intégralité des fonctionnalités baseline du dépôt officiel DeepSeek-Coder V1 (`deepseek-ai/deepseek-coder-1.3b-instruct`, `6.7b-instruct`, `33b-instruct`).
+Cette version personnalisée s'appuie sur la baseline du modèle DeepSeek-Coder V1 (`deepseek-ai/deepseek-coder-1.3b-instruct`, `6.7b-instruct`, `33b-instruct`).
 - **Verrouillage V1** : L'utilisation de modèles V2, V3, R1 ou dérivés est strictement bloquée dans le code (`DEFAULT_MODEL_NAME = "deepseek-ai/deepseek-coder-6.7b-instruct"`).
-- **Rétrocompatibilité** : Tous les scripts d'évaluation originaux (`Evaluation/`) et le fine-tuning Full ZeRO-3 fonctionnent sans aucune modification de leurs commandes CLI.
 
 ---
 
-## 2. NOUVELLES FONCTIONNALITÉS ET EXTENSIONS
+## 2. FONCTIONNALITÉS ET EXTENSIONS CYBERSOCLE
 
 ### 2.1. Fine-Tuning LoRA / QLoRA
-- Script étendu : `finetune/finetune_deepseekcoder.py`
+- Script de Fine-tuning avec Anonymisation : `finetune/finetune_cybersocle.py`
+  - Supprime automatiquement les adresses IP, jetons Bearer, clés API et e-mails des données clients avant l'entraînement.
   ```bash
-  python finetune/finetune_deepseekcoder.py \
+  python finetune/finetune_cybersocle.py \
     --model_name_or_path deepseek-ai/deepseek-coder-6.7b-instruct \
     --data_path ./data/dataset.json \
     --output_dir ./models/cybersocle-lora \
     --use_peft --load_in_4bit --lora_r 16 --lora_alpha 32
   ```
-- Anonymisation et Fine-tuning Continu : `finetune/finetune_cybersocle.py`
-  - Supprime automatiquement les adresses IP, jetons Bearer, clés API et e-mails des données clients avant l'entraînement.
 - Fusion des adaptateurs LoRA : `finetune/merge_peft_adapters.py`
   ```bash
   python finetune/merge_peft_adapters.py \

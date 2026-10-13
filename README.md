@@ -1,147 +1,114 @@
+<p align="center">
+  <img src="pictures/logo.png" alt="CYBERSOCLE Logo" width="220px"/>
+</p>
 
+<h1 align="center">CYBERSOCLE</h1>
 
-### Gouvernance, Conformité & Documentation
+<p align="center">
+  <strong>Plateforme Souveraine de Microsegmentation Réseau, Deception SSH & Cybercartographie par IA Offline STIX 2.1</strong>
+</p>
 
-- **Gouvernance**: [CONTRIBUTING.md](CONTRIBUTING.md) | [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | [SECURITY.md](SECURITY.md) | [CHANGELOG.md](CHANGELOG.md) | [ROADMAP.md](ROADMAP.md)
-- **Conformité & Éthique**: [PRIVACY.md](PRIVACY.md) | [TERMS.md](TERMS.md) | [COMPLIANCE.md](COMPLIANCE.md) | [MODEL_CARD.md](MODEL_CARD.md) | [DATASHEET.md](DATASHEET.md) | [ETHICS.md](ETHICS.md) | [SBOM.json](SBOM.json)
-- **Opérationnel**: [ACKNOWLEDGMENTS.md](ACKNOWLEDGMENTS.md) | [FAQ.md](FAQ.md) | [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | [PERFORMANCE.md](PERFORMANCE.md) | [SECURITY_AUDIT_REPORT.md](SECURITY_AUDIT_REPORT.md) | [DISASTER_RECOVERY.md](DISASTER_RECOVERY.md) | [INCIDENT_RESPONSE.md](INCIDENT_RESPONSE.md) | [SLA.md](SLA.md) | [SUPPORT.md](SUPPORT.md)
+<p align="center">
+  <a href="https://cybersocle.studio"><img src="https://img.shields.io/badge/Site_Officiel-cybersocle.studio-0052CC?style=for-the-badge&logo=internet-explorer" alt="CYBERSOCLE Studio"/></a>
+  <a href="https://wa.me/242066130118"><img src="https://img.shields.io/badge/WhatsApp-Support-25D366?style=for-the-badge&logo=whatsapp" alt="WhatsApp Support"/></a>
+  <img src="https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python" alt="Python Version"/>
+  <img src="https://img.shields.io/badge/Licence-MIT-green?style=for-the-badge" alt="License"/>
+</p>
 
 ---
 
-### 1. Introduction of DeepSeek Coder
+## 🛡️ Présentation
 
-DeepSeek Coder is composed of a series of code language models, each trained from scratch on 2T tokens, with a composition of 87% code and 13% natural language in both English and Chinese. We provide various sizes of the code model, ranging from 1B to 33B versions. Each model is pre-trained on project-level code corpus by employing a window size of 16K and an extra fill-in-the-blank task, to support project-level code completion and infilling. For coding capabilities, DeepSeek Coder achieves state-of-the-art performance among open-source code models on multiple programming languages and various benchmarks.
+**CYBERSOCLE** est une solution complète de cyberdéfense souveraine et de microsegmentation réseau conçue pour isoler les menaces, détecter les intrusions via déception dynamique et cartographier les incidents en temps réel grâce à un moteur d'IA offline autonome sans dépendance cloud externe.
 
-<p align="center">
-<img src="pictures/result.png" alt="result" width="70%">
-</p>
-
-- **Massive Training Data**: Trained from scratch on 2T tokens, including 87% code and 13% linguistic data in both English and Chinese languages.
-
-- **Highly Flexible & Scalable**: Offered in model sizes of 1B, 5.7B, 6.7B and 33B, enabling users to choose the setup most suitable for their requirements.
-
-- **Superior Model Performance**: State-of-the-art performance among publicly available code models on HumanEval, MultiPL-E, MBPP, DS-1000, and APPS benchmarks.
-
-- **Advanced Code Completion Capabilities**: A window size of 16K and a fill-in-the-blank task, supporting project-level code completion and infilling tasks.
-
-#### Supported Programming Languages
-`['ada', 'agda', 'alloy', 'antlr', 'applescript', 'assembly', 'augeas', 'awk', 'batchfile', 'bluespec', 'c', 'c-sharp', 'clojure', 'cmake', 'coffeescript', 'common-lisp', 'cpp', 'css', 'cuda', 'dart', 'dockerfile', 'elixir', 'elm', 'emacs-lisp', 'erlang', 'f-sharp', 'fortran', 'glsl', 'go', 'groovy', 'haskell', 'html', 'idris', 'isabelle', 'java', 'java-server-pages', 'javascript', 'json', 'julia', 'jupyter-notebook', 'kotlin', 'lean', 'literate-agda', 'literate-coffeescript', 'literate-haskell', 'lua', 'makefile', 'maple', 'markdown', 'mathematica', 'matlab', 'ocaml', 'pascal', 'perl', 'php', 'powershell', 'prolog', 'protocol-buffer', 'python', 'r', 'racket', 'restructuredtext', 'rmarkdown', 'ruby', 'rust', 'sas', 'scala', 'scheme', 'shell', 'smalltalk', 'solidity', 'sparql', 'sql', 'stan', 'standard-ml', 'stata', 'systemverilog', 'tcl', 'tcsh', 'tex', 'thrift', 'typescript', 'verilog', 'vhdl', 'visual-basic', 'xslt', 'yacc', 'yaml', 'zig']`
-
-### 2. Evaluation Results
-We evaluate DeepSeek Coder on various coding-related benchmarks.
-Only `pass@1` results on HumanEval (Python and Multilingual), MBPP, and DS-1000 are reported here:
+Conçu pour fonctionner dans des environnements à ressources contraintes (VPS Client avec max 8 GB RAM ou VPS Central LAB avec 2 GB RAM), **CYBERSOCLE** combine l'observabilité réseau eBPF/Falco, la journalisation immuable par Registre Merkle et la génération automatique de vaccins cyber.
 
 <p align="center">
-<img src="pictures/table.png" alt="table" width="70%">
+  <img src="pictures/home.png" alt="Interface CYBERSOCLE" width="85%"/>
 </p>
 
+---
 
-The result shows that DeepSeek-Coder-Base-33B significantly outperforms existing open-source code LLMs. Compared with CodeLlama-34B, it leads by 7.9%, 9.3%, 10.8% and 5.9% respectively on HumanEval Python, HumanEval Multilingual, MBPP and DS-1000.
-Surprisingly, our DeepSeek-Coder-Base-7B reaches the performance of CodeLlama-34B.
-The DeepSeek-Coder-Instruct-33B model after instruction tuning outperforms GPT35-turbo on HumanEval and achieves comparable results with GPT35-turbo on MBPP.
+## ✨ Fonctionnalités Clés
 
-More evaluation details can be found in the [Detailed Evaluation](#6-detailed-evaluation-results).
+- 🔒 **Microsegmentation Réseau & eBPF Cilium** : Isolement dynamique des flux, conteneurs durcis et VLANs virtuels sécurisés (`cybersocle.network`).
+- 🍯 **Proxy SSH Honeypot & Deception** : Piège SSH interactif, leurres dynamiques avec attestation TPM et isolation navigateur (`cybersocle.auth`).
+- 📜 **Journalisation Immuable & Sidecar Falco** : Ledger Merkle cryptographique et tuyau unidirectionnel à haute sécurité (`cybersocle.logging`).
+- 🤖 **Cartographie Cyber IA Offline & STIX 2.1** : Génération de fiches d'incidents normalisées STIX 2.1 avec LLM local quantifié (`cybersocle.llm`).
+- 🧪 **Laboratoire Vectoriel & Vaccin Cyber** : Qualification automatisée des menaces et déploiement de règles de défense (`cybersocle.science`).
+- 🚨 **Isolation & Quarantaine d'Incidents** : Clonage d'incidents et application de règles YAML d'urgence (`cybersocle.isolation`).
+- 🌐 **Architecture Multi-Entreprises & GitOps** : Gestion multi-tenant et synchronisation des politiques réseau (`cybersocle.ecosystem`).
 
+---
 
-### 3. Procedure of Data Creation and Model Training
+## 🏗️ Architecture des Modules
 
-#### Data Creation
-
-- Step 1: Collect code data from GitHub and apply the same filtering rules as [StarCoder Data](https://github.com/bigcode-project/bigcode-dataset) to filter data.
-- Step 2: Parsing the dependencies of files within the same repository to rearrange the file positions based on their dependencies.
-- Step 3: Concatenating dependent files to form a single example and employ repo-level minhash for deduplication.
-- Step 4: Further filtering out low-quality code, such as codes with syntax errors or poor readability.
-
-<img src="pictures/data_clean.png" alt="data_creation" width="100%">
-
-#### Model Training
-
-- Step 1: Initially pre-trained with a dataset consisting of 87% code, 10% code-related language (Github Markdown and StackExchange), and 3% non-code-related Chinese language. Models are pre-trained using 1.8T tokens and a 4K window size in this step.
-- Step 2: Further Pre-training using an extended 16K window size on an additional 200B tokens, resulting in foundational models (**DeepSeek-Coder-Base**).
-- Step 3: Instruction Fine-tuning on 2B tokens of instruction data, resulting in instruction-tuned models (**DeepSeek-Coder-Instruct**).
-
-<img src="pictures/model_pretraining.png" alt="model_pretraining" width="100%">
-
-
-### 4. How to Use
-Before proceeding, you'll need to install the necessary dependencies. You can do this by running the following command:
 ```
-pip install -r requirements.txt
-```
-A demo is also available on the [🤗 Hugging Face Space](https://huggingface.co/spaces/deepseek-ai/deepseek-coder-33b-instruct), and you can run the demo locally using `app.py` in the [demo](https://github.com/deepseek-ai/deepseek-coder/tree/main/demo) folder.  (Thanks to all the HF team for their support)
-
-Here are some examples of how to use our model.
-
-#### 1) Code Completion
-```python
-from transformers import AutoTokenizer, AutoModelForCausalLM
-import torch
-tokenizer = AutoTokenizer.from_pretrained("deepseek-ai/deepseek-coder-6.7b-base", trust_remote_code=True)
-model = AutoModelForCausalLM.from_pretrained("deepseek-ai/deepseek-coder-6.7b-base", trust_remote_code=True, torch_dtype=torch.bfloat16).cuda()
-input_text = "#write a quick sort algorithm"
-inputs = tokenizer(input_text, return_tensors="pt").to(model.device)
-outputs = model.generate(**inputs, max_length=128)
-print(tokenizer.decode(outputs[0], skip_special_tokens=True))
-```
-
-#### 2) Code Insertion
-```python
-from transformers import AutoTokenizer, AutoModelForCausalLM
-import torch
-tokenizer = AutoTokenizer.from_pretrained("deepseek-ai/deepseek-coder-6.7b-base", trust_remote_code=True)
-model = AutoModelForCausalLM.from_pretrained("deepseek-ai/deepseek-coder-6.7b-base", trust_remote_code=True, torch_dtype=torch.bfloat16).cuda()
-input_text = """<｜fim▁begin｜>def quick_sort(arr):
-    if len(arr) <= 1:
-        return arr
-    pivot = arr[0]
-    left = []
-    right = []
-<｜fim▁hole｜>
-        if arr[i] < pivot:
-            left.append(arr[i])
-        else:
-            right.append(arr[i])
-    return quick_sort(left) + [pivot] + quick_sort(right)<｜fim▁end｜>"""
-inputs = tokenizer(input_text, return_tensors="pt").to(model.device)
-outputs = model.generate(**inputs, max_length=128)
-print(tokenizer.decode(outputs[0], skip_special_tokens=True)[len(input_text):])
-```
-
-#### 3) Chat Model Inference
-```python
-from transformers import AutoTokenizer, AutoModelForCausalLM
-import torch
-tokenizer = AutoTokenizer.from_pretrained("deepseek-ai/deepseek-coder-6.7b-instruct", trust_remote_code=True)
-model = AutoModelForCausalLM.from_pretrained("deepseek-ai/deepseek-coder-6.7b-instruct", trust_remote_code=True, torch_dtype=torch.bfloat16).cuda()
-messages=[
-    { 'role': 'user', 'content': "write a quick sort algorithm in python."}
-]
-inputs = tokenizer.apply_chat_template(messages, add_generation_prompt=True, return_tensors="pt").to(model.device)
-# tokenizer.eos_token_id is the id of <|EOT|> token
-outputs = model.generate(inputs, max_new_tokens=512, do_sample=False, top_k=50, top_p=0.95, num_return_sequences=1, eos_token_id=tokenizer.eos_token_id)
-print(tokenizer.decode(outputs[0][len(inputs[0]):], skip_special_tokens=True))
+cybersocle/
+├── auth/         # Proxies SSH, leurres TPM, isolation navigateur
+├── network/      # Microsegmentation eBPF, Cilium, durcissement conteneurs
+├── logging/      # Registre immuable Merkle, sidecar Falco, tuyau unidirectionnel
+├── isolation/    # Quarantaine d'incidents, gestionnaire de crises & règles YAML
+├── llm/          # Moteur LLM local offline, générateur de fiches STIX 2.1
+├── science/      # Moteur de vaccins cyber, qualificateur de menaces, lab vectoriel
+├── ecosystem/    # Multi-tenant, GitOps & orchestration
+├── web/          # Backend API & démonstrateur Gradio
+└── cli.py        # Point d'entrée CLI unifié
 ```
 
 ---
 
-### 5. How to Fine-tune DeepSeek-Coder (Full / LoRA / QLoRA)
+## 🚀 Installation & Démarrage Rapide
 
-We provide `finetune/finetune_deepseekcoder.py` and `finetune/finetune_cybersocle.py` for finetuning our models on downstream tasks.
+### 1. Prérequis & Installation
 
 ```bash
-pip install -r finetune/requirements.txt
+git clone https://github.com/cybersocle/cybersocle.git
+cd cybersocle
+pip install -e .
 ```
 
-#### QLoRA Fine-Tuning
+### 2. Utilisation de la Ligne de Commande (CLI)
+
+CYBERSOCLE propose deux modes de déploiement optimisés :
+
+- **Mode Client VPS (8 GB RAM)** :
+  ```bash
+  python -m cybersocle.cli --client
+  ```
+
+- **Mode Central LAB VPS (2 GB RAM)** :
+  ```bash
+  python -m cybersocle.cli --lab
+  ```
+
+---
+
+## 🖥️ Démonstration Web & Serveurs API
+
+### Interface Démo Interactive (Gradio)
+Consultez l'interface de démonstration bilingue (Français/Anglais) :
 ```bash
-python finetune/finetune_deepseekcoder.py \
-    --model_name_or_path deepseek-ai/deepseek-coder-6.7b-instruct \
-    --data_path ./data/dataset.json \
-    --output_dir ./models/cybersocle-lora \
-    --use_peft --load_in_4bit --lora_r 16 --lora_alpha 32
+python demo/app.py
 ```
 
-#### Continuous Fine-Tuning with Anonymization
+### Serveur API FastAPI & vLLM
+Lancer le serveur API de cyberdéfense :
+```bash
+python -m serve.api_server
+```
+
+Déploiement Docker Compose :
+```bash
+docker compose up --build -d
+```
+
+---
+
+## ⚙️ Fine-Tuning Spécifique CYBERSOCLE
+
+Pour réentraîner le modèle LLM local sur des données de cyberdéfense avec anonymisation intégrée :
+
 ```bash
 python finetune/finetune_cybersocle.py \
     --data_path ./data/raw_data.json \
@@ -150,24 +117,18 @@ python finetune/finetune_cybersocle.py \
 
 ---
 
-### 6. Running the API Server & Docker Deployment
+## 📚 Governance, Documentation & Support
 
-#### Local FastAPI Launch
-```bash
-pip install -r requirements-serve.txt
-python -m serve.api_server
-```
-
-#### Docker Compose Launch
-```bash
-docker compose up --build -d
-```
-
-For complete documentation, security incident procedures, and cost analyses, see `DOCS_CYBERSOCLE.md` and `INCIDENT_RESPONSE.md`.
+- **Documentation Technique** : `DOCS_CYBERSOCLE.md` & `devops/devops.md`
+- **Réponse aux Incidents** : `INCIDENT_RESPONSE.md` & `DISASTER_RECOVERY.md`
+- **Sécurité & Conduite** : `SECURITY.md` | `CODE_OF_CONDUCT.md` | `ETHICS.md`
+- **Rapports d'Audit** : `SECURITY_AUDIT_REPORT.md` | `COMPLIANCE.md` | `SLA.md`
+- **Support Officiel** :
+  - **Site Web** : [https://cybersocle.studio](https://cybersocle.studio)
+  - **WhatsApp** : [+242 06 613 01 18](https://wa.me/242066130118)
 
 ---
 
-### 7. License
-This code repository is licensed under the MIT License. The use of DeepSeek Coder models is subject to the Model License. DeepSeek Coder supports commercial use.
+## 📄 Licence
 
-See the [LICENSE-CODE](LICENSE-CODE) and [LICENSE-MODEL](LICENSE-MODEL) for more details.
+Ce projet est sous licence MIT. Consultez le fichier [LICENSE-CODE](LICENSE-CODE) pour plus de détails.

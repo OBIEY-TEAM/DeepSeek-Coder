@@ -1,6 +1,6 @@
 import unittest
 
-from finetune.finetune_deepseekcoder import EOT_TOKEN, build_instruction_prompt
+from finetune.finetune_cybersocle import EOT_TOKEN, build_instruction_prompt
 
 
 class TestTemplates(unittest.TestCase):
